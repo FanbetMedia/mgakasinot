@@ -1,6 +1,5 @@
 ---
 import "../styles/global.css";
-import { pages } from "../data/site";
 
 const {
   title,
@@ -15,178 +14,49 @@ const canonicalUrl = new URL(canonical, siteUrl).toString();
 const ogImageUrl = new URL(ogImage, siteUrl).toString();
 const schemaType = pageType === "Article" ? "Article" : "WebPage";
 const buildSha = import.meta.env.PUBLIC_BUILD_SHA || "local";
-
-const schema = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://mgakasinot.com/#organization",
-      name: "MGA Kasinot",
-      url: "https://mgakasinot.com/",
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://mgakasinot.com/#website",
-      url: "https://mgakasinot.com/",
-      name: "MGA Kasinot",
-      inLanguage: "fi-FI",
-      publisher: { "@id": "https://mgakasinot.com/#organization" },
-    },
-    {
-      "@type": schemaType,
-      "@id": `${canonicalUrl}#webpage`,
-      url: canonicalUrl,
-      name: title,
-      ...(description ? { description } : {}),
-      inLanguage: "fi-FI",
-      isPartOf: { "@id": "https://mgakasinot.com/#website" },
-      ...(schemaType === "Article" ? {
-        headline: title,
-        publisher: { "@id": "https://mgakasinot.com/#organization" }
-      } : {}),
-    },
-  ],
-};
-
+const schema = {"@context":"https://schema.org","@graph":[{"@type":"Organization","@id":"https://mgakasinot.com/#organization",name:"MGA Kasinot",url:"https://mgakasinot.com/"},{"@type":"WebSite","@id":"https://mgakasinot.com/#website",url:"https://mgakasinot.com/",name:"MGA Kasinot",inLanguage:"fi-FI",publisher:{"@id":"https://mgakasinot.com/#organization"}},{"@type":schemaType,"@id":`${canonicalUrl}#webpage`,url:canonicalUrl,name:title,...(description?{description}:{}),inLanguage:"fi-FI",isPartOf:{"@id":"https://mgakasinot.com/#website"},...(schemaType==="Article"?{headline:title,publisher:{"@id":"https://mgakasinot.com/#organization"}}:{})}]};
 const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 <!doctype html>
 <html lang="fi" data-build-sha={buildSha}>
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width" />
-<meta name="x-build-sha" content={buildSha} />
-<title>{title}</title>
-{description && <meta name="description" content={description} />}
-<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
-<link rel="canonical" href={canonicalUrl} />
-<link rel="alternate" hreflang="fi" href={canonicalUrl} />
-<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
-<link rel="stylesheet" href="/content-layout-fixes.css" />
-<link rel="stylesheet" href="/dispute-contact.css" />
-
-<meta property="og:type" content={pageType === "Article" ? "article" : "website"} />
-<meta property="og:locale" content="fi_FI" />
-<meta property="og:site_name" content="MGA Kasinot" />
-<meta property="og:title" content={title} />
-{description && <meta property="og:description" content={description} />}
-<meta property="og:url" content={canonicalUrl} />
-<meta property="og:image" content={ogImageUrl} />
-
-<meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
-{description && <meta name="twitter:description" content={description} />}
-<meta name="twitter:image" content={ogImageUrl} />
-
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width" /><meta name="x-build-sha" content={buildSha} />
+<title>{title}</title>{description && <meta name="description" content={description} />}
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" /><link rel="canonical" href={canonicalUrl} /><link rel="alternate" hreflang="fi" href={canonicalUrl} /><link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+<link rel="stylesheet" href="/content-layout-fixes.css" /><link rel="stylesheet" href="/dispute-contact.css" /><link rel="stylesheet" href="/navigation-enhancements.css" />
+<meta property="og:type" content={pageType === "Article" ? "article" : "website"} /><meta property="og:locale" content="fi_FI" /><meta property="og:site_name" content="MGA Kasinot" /><meta property="og:title" content={title} />{description && <meta property="og:description" content={description} />}<meta property="og:url" content={canonicalUrl} /><meta property="og:image" content={ogImageUrl} />
+<meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content={title} />{description && <meta name="twitter:description" content={description} />}<meta name="twitter:image" content={ogImageUrl} />
 <script type="application/ld+json" set:html={jsonLd}></script>
 </head>
 <body>
 <header class="site-header">
-  <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="MGA Kasinot etusivu">
-      <span class="brand-mark">MGA</span>
-      <span class="brand-name">Kasinot</span>
-    </a>
-
-    <button class="menu-toggle" type="button" aria-label="Avaa valikko" aria-expanded="false" aria-controls="main-menu" data-menu-toggle>
-      <span></span><span></span><span></span>
-    </button>
-
-    <nav id="main-menu" class="main-nav" aria-label="Päävalikko" data-menu>
-      <a href="/nettikasinot/">Nettikasinot</a>
-      <a href="/uudet-nettikasinot/">Uudet nettikasinot</a>
-      <a href="/ilmaiskierrokset/">Ilmaiskierrokset</a>
-      <a href="/kasinobonukset/">Kasinobonukset</a>
-      <a href="/artikkelit/">Artikkelit</a>
-    </nav>
-  </div>
+ <div class="shell header-inner">
+  <a class="brand" href="/" aria-label="MGA Kasinot etusivu"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="brand-name">MGA Kasinot</span></a>
+  <button class="menu-toggle" type="button" aria-label="Avaa valikko" aria-expanded="false" aria-controls="main-menu" data-menu-toggle><span></span><span></span><span></span></button>
+  <nav id="main-menu" class="main-nav" aria-label="Päävalikko" data-menu><div class="mobile-menu-head">Valikko</div><a href="/nettikasinot/">Nettikasinot</a><a href="/uudet-nettikasinot/">Uudet nettikasinot</a><a href="/ilmaiskierrokset/">Ilmaiskierrokset</a><a href="/kasinobonukset/">Kasinobonukset</a><a href="/artikkelit/">Artikkelit</a></nav>
+ </div>
 </header>
-
-<main>
-  <slot />
-</main>
-
+<div class="menu-backdrop" data-menu-backdrop aria-hidden="true"></div>
+<main><slot /></main>
 <footer class="site-footer">
-  <div class="shell footer-grid">
-    <section class="footer-about" aria-labelledby="footer-about-title">
-      <a class="brand footer-brand" href="/">
-        <span class="brand-mark">MGA</span>
-        <span class="brand-name">Kasinot</span>
-      </a>
-      <h2 id="footer-about-title" class="sr-only">Tietoa sivustosta</h2>
-      <p>MGA Kasinot kokoaa kasinovertailuja, bonustietoja ja rahapelaamiseen liittyviä oppaita suomalaisille lukijoille.</p>
-      <div class="responsible-row" aria-label="Vastuullinen pelaaminen ja viranomaislinkit">
-        <a href="https://www.peluuri.fi/" target="_blank" rel="nofollow noopener noreferrer">Peluuri</a>
-        <a href="https://www.gamcare.org.uk/" target="_blank" rel="nofollow noopener noreferrer">GamCare</a>
-        <a href="https://www.emta.ee/en" target="_blank" rel="nofollow noopener noreferrer">EMTA</a>
-        <a href="https://www.mga.org.mt/" target="_blank" rel="nofollow noopener noreferrer">MGA</a>
-        <span class="age-badge" aria-label="Vain 18 vuotta täyttäneille">18+</span>
-      </div>
-    </section>
-
-    <nav class="footer-column footer-site-links" aria-label="Sivusto">
-      <h3>Sivusto</h3>
-      <ul>
-        <li><a href="/nettikasinot/">Nettikasinot</a></li>
-        <li><a href="/uudet-nettikasinot/">Uudet nettikasinot</a></li>
-        <li><a href="/kasinobonukset/">Kasinobonukset</a></li>
-        <li><a href="/ilmaiskierrokset/">Ilmaiskierrokset</a></li>
-        <li><a href="/artikkelit/">Artikkelit</a></li>
-      </ul>
-    </nav>
-
-    <section class="footer-contact" aria-labelledby="footer-contact-title">
-      <h3 id="footer-contact-title">Ota yhteyttä</h3>
-      <p>Kysyttävää sivustosta, sisällöistä tai yhteistyöstä?</p>
-      <a class="footer-email" href="mailto:info@mgakasinot.com">
-        <span class="footer-email-icon" aria-hidden="true">@</span>
-        <span>info@mgakasinot.com</span>
-      </a>
-    </section>
-  </div>
-
-  <div class="shell footer-notice">
-    <p>Rahapelaaminen on tarkoitettu vain 18 vuotta täyttäneille. Pelaa maltilla ja hae tarvittaessa apua Peluurista.</p>
-  </div>
-
-  <div class="footer-bottom">
-    <div class="shell footer-bottom-inner">
-      <span>© {new Date().getFullYear()} MGA Kasinot</span>
-      <span>18+ · Pelaa vastuullisesti</span>
-    </div>
-  </div>
+ <div class="shell footer-grid">
+  <section class="footer-about" aria-labelledby="footer-about-title"><a class="brand footer-brand" href="/"><span class="brand-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="7.25" stroke="currentColor" stroke-width="1.6"/><path d="M12 2.5v4M12 17.5v4M2.5 12h4M17.5 12h4M8.6 8.6l6.8 6.8M15.4 8.6l-6.8 6.8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span><span class="brand-name">MGA Kasinot</span></a><h2 id="footer-about-title" class="sr-only">Tietoa sivustosta</h2><p>MGA Kasinot kokoaa kasinovertailuja, bonustietoja ja rahapelaamiseen liittyviä oppaita suomalaisille lukijoille.</p><div class="responsible-row" aria-label="Vastuullinen pelaaminen ja viranomaislinkit"><a href="https://www.peluuri.fi/" target="_blank" rel="nofollow noopener noreferrer">Peluuri</a><a href="https://www.gamcare.org.uk/" target="_blank" rel="nofollow noopener noreferrer">GamCare</a><a href="https://www.emta.ee/en" target="_blank" rel="nofollow noopener noreferrer">EMTA</a><a href="https://www.mga.org.mt/" target="_blank" rel="nofollow noopener noreferrer">MGA</a><span class="age-badge" aria-label="Vain 18 vuotta täyttäneille">18+</span></div></section>
+  <nav class="footer-column footer-site-links" aria-label="Sivusto"><h3>Sivusto</h3><ul><li><a href="/nettikasinot/">Nettikasinot</a></li><li><a href="/uudet-nettikasinot/">Uudet nettikasinot</a></li><li><a href="/kasinobonukset/">Kasinobonukset</a></li><li><a href="/ilmaiskierrokset/">Ilmaiskierrokset</a></li><li><a href="/artikkelit/">Artikkelit</a></li><li><a class="footer-sitemap-link" href="/sivukartta/">Sivukartta <span aria-hidden="true">→</span></a></li></ul></nav>
+  <section class="footer-contact" aria-labelledby="footer-contact-title"><h3 id="footer-contact-title">Ota yhteyttä</h3><p>Kysyttävää sivustosta, sisällöistä tai yhteistyöstä?</p><a class="footer-email" href="mailto:info@mgakasinot.com"><span class="footer-email-icon" aria-hidden="true">@</span><span>info@mgakasinot.com</span></a></section>
+ </div>
+ <div class="shell footer-notice"><p>Rahapelaaminen on tarkoitettu vain 18 vuotta täyttäneille. Pelaa maltilla ja hae tarvittaessa apua Peluurista.</p></div>
+ <div class="footer-bottom"><div class="shell footer-bottom-inner"><span>© {new Date().getFullYear()} MGA Kasinot</span><span>18+ · Pelaa vastuullisesti</span></div></div>
 </footer>
-
-<script is:inline src="/license-checker-enhancements.js" defer></script>
-<script is:inline src="/dispute-contact.js" defer></script>
+<button class="back-to-top" type="button" aria-label="Takaisin sivun alkuun" title="Takaisin ylös" data-back-to-top><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 14.5 12 8l6 6.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+<script is:inline src="/license-checker-enhancements.js" defer></script><script is:inline src="/dispute-contact.js" defer></script>
 <script>
-  const toggle = document.querySelector("[data-menu-toggle]");
-  const menu = document.querySelector("[data-menu]");
-
-  if (toggle instanceof HTMLButtonElement && menu instanceof HTMLElement) {
-    const closeMenu = () => {
-      menu.classList.remove("is-open");
-      toggle.classList.remove("is-open");
-      toggle.setAttribute("aria-expanded", "false");
-      document.body.classList.remove("menu-open");
-    };
-
-    toggle.addEventListener("click", () => {
-      const open = !menu.classList.contains("is-open");
-      menu.classList.toggle("is-open", open);
-      toggle.classList.toggle("is-open", open);
-      toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      document.body.classList.toggle("menu-open", open);
-    });
-
-    menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
-
-    const desktopQuery = window.matchMedia("(min-width: 921px)");
-    desktopQuery.addEventListener("change", (event) => {
-      if (event.matches) closeMenu();
-    });
-  }
+ const toggle=document.querySelector("[data-menu-toggle]"); const menu=document.querySelector("[data-menu]"); const backdrop=document.querySelector("[data-menu-backdrop]"); const topButton=document.querySelector("[data-back-to-top]");
+ if(toggle instanceof HTMLButtonElement&&menu instanceof HTMLElement){
+  const closeMenu=()=>{menu.classList.remove("is-open");toggle.classList.remove("is-open");backdrop?.classList.remove("is-open");toggle.setAttribute("aria-expanded","false");document.body.classList.remove("menu-open")};
+  const openMenu=()=>{menu.classList.add("is-open");toggle.classList.add("is-open");backdrop?.classList.add("is-open");toggle.setAttribute("aria-expanded","true");document.body.classList.add("menu-open")};
+  toggle.addEventListener("click",()=>menu.classList.contains("is-open")?closeMenu():openMenu()); backdrop?.addEventListener("click",closeMenu); menu.querySelectorAll("a").forEach(link=>link.addEventListener("click",closeMenu)); document.addEventListener("keydown",e=>{if(e.key==="Escape")closeMenu()});
+  window.matchMedia("(min-width: 921px)").addEventListener("change",event=>{if(event.matches)closeMenu()});
+ }
+ if(topButton instanceof HTMLButtonElement){const sync=()=>topButton.classList.toggle("is-visible",window.scrollY>520);sync();window.addEventListener("scroll",sync,{passive:true});topButton.addEventListener("click",()=>window.scrollTo({top:0,behavior:"smooth"}))}
 </script>
-</body>
-</html>
+</body></html>
