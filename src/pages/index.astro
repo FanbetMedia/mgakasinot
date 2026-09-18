@@ -2,6 +2,7 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
 import HomeGuide from "../components/HomeGuide.astro";
+import StructuredContent from "../components/StructuredContent.astro";
 import { pages, brands } from "../data/site";
 import { buildInternalLinks } from "../lib/internalLinks";
 import { optimizeContentImages } from "../lib/contentImages";
@@ -52,6 +53,19 @@ const articles = pages.filter((p)=>p.type === "post").slice(0,3);
 
   <HomeGuide />
 
+  <section class="section shell home-original-guide" id="mga-opas">
+    <div class="section-heading home-original-guide__heading">
+      <div>
+        <span class="eyebrow">SYVENTÄVÄ MGA-OPAS</span>
+        <h2>Koko MGA-opas selkeämpänä kokonaisuutena</h2>
+      </div>
+      <p>Alkuperäiset otsikot, tekstit, kuvat ja linkit on säilytetty. Sisältö on vain rytmitetty uudelleen ja täydennetty aiheeseen sopivilla vertailuilla, tarkistuslistoilla ja vaiheilla.</p>
+    </div>
+    <article class="content content-home">
+      <StructuredContent html={deepGuideHtml} slug="mga-kasinot" type="page" />
+    </article>
+  </section>
+
   <section class="section shell article-showcase">
     <div class="section-heading">
       <div>
@@ -70,21 +84,6 @@ const articles = pages.filter((p)=>p.type === "post").slice(0,3);
         </a>
       ))}
     </div>
-  </section>
-
-  <section class="shell deep-guide-wrap">
-    <details class="deep-guide">
-      <summary>
-        <span>
-          <small>SYVENTÄVÄ OPAS</small>
-          <strong>Lue koko alkuperäinen MGA-opas</strong>
-        </span>
-        <span class="deep-guide__plus" aria-hidden="true">+</span>
-      </summary>
-      <article class="content content-home deep-guide__content">
-        <Fragment set:html={deepGuideHtml} />
-      </article>
-    </details>
   </section>
 </BaseLayout>
 
@@ -109,15 +108,9 @@ const articles = pages.filter((p)=>p.type === "post").slice(0,3);
   .home-hero__mark-year{position:absolute;right:0;bottom:10px;color:#53697d;font-size:12px;font-weight:900;letter-spacing:.16em}
 
   .comparison-heading{padding-top:20px}
-  .deep-guide-wrap{padding:30px 0 92px}
-  .deep-guide{border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13)}
-  .deep-guide summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0}
-  .deep-guide summary::-webkit-details-marker{display:none}
-  .deep-guide summary small{display:block;color:#ffad63;font-size:11px;font-weight:900;letter-spacing:.13em;margin-bottom:5px}
-  .deep-guide summary strong{display:block;color:#fff;font-size:22px;letter-spacing:-.02em}
-  .deep-guide__plus{color:#ff9b3d;font-size:30px;line-height:1;transition:transform .2s ease}
-  .deep-guide[open] .deep-guide__plus{transform:rotate(45deg)}
-  .deep-guide__content{padding-top:28px;padding-bottom:64px}
+  .home-original-guide{padding-top:76px}
+  .home-original-guide__heading{padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.12);margin-bottom:14px}
+  .home-original-guide__heading>p{max-width:500px}
 
   @media (max-width:900px){
     .home-hero__grid{grid-template-columns:1fr;gap:42px;min-height:0}
@@ -129,6 +122,6 @@ const articles = pages.filter((p)=>p.type === "post").slice(0,3);
     .home-hero__copy h1{font-size:clamp(42px,14vw,64px)}
     .home-hero__facts{grid-template-columns:1fr}.home-hero__facts>div,.home-hero__facts>div+div{padding:15px 0;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.home-hero__facts>div:last-child{border-bottom:0}
     .home-hero__mark strong{font-size:110px}.home-hero__mark-kicker{position:static;margin-bottom:24px}.home-hero__mark-year{bottom:0}
-    .comparison-heading{display:block}.comparison-heading>p{text-align:left;margin-top:14px}
+    .comparison-heading,.home-original-guide__heading{display:block}.comparison-heading>p,.home-original-guide__heading>p{text-align:left;margin-top:14px}
   }
 </style>
