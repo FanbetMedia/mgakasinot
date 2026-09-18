@@ -1,0 +1,54 @@
+name: Build and deploy Astro
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+concurrency:
+  group: production-deploy-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build
+      - name: Deploy dist to SiteGround
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SG_SSH_PASSPHRASE }}
+          SSH_HOST: ${{ secrets.SG_SSH_HOST }}
+          SSH_USER: ${{ secrets.SG_SSH_USER }}
+          SSH_PORT: ${{ secrets.SG_SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/siteground_key
+          chmod 600 ~/.ssh/siteground_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          cat > ~/.ssh/askpass.sh <<'EOF'
+          #!/bin/sh
+          echo "$SSH_PASSPHRASE"
+          EOF
+          chmod 700 ~/.ssh/askpass.sh
+          export SSH_ASKPASS=~/.ssh/askpass.sh SSH_ASKPASS_REQUIRE=force DISPLAY=:0 SSH_PASSPHRASE
+          setsid ssh-add ~/.ssh/siteground_key </dev/null
+          test -f dist/index.html
+          if [ -d dist/_astro ]; then
+            rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
+          fi
+          rsync -az --delete --exclude='.well-known/' --exclude='php_errorlog' --exclude='_astro/' --exclude='wp-content/uploads/' -e "ssh -p $SSH_PORT" dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
