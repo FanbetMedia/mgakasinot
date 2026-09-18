@@ -64,7 +64,7 @@ const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
 <link rel="alternate" hreflang="fi" href={canonicalUrl} />
 <link rel="alternate" hreflang="x-default" href={canonicalUrl} />
 
-<meta property="og:type" content={pageType === "Article" ? "article" : "website"} />
+<meta property="og:type" content={pageType === "Article" ? "article" : "website" />
 <meta property="og:locale" content="fi_FI" />
 <meta property="og:site_name" content="MGA Kasinot" />
 <meta property="og:title" content={title} />
@@ -156,6 +156,7 @@ const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
   </div>
 </footer>
 
+<script src="/license-checker-enhancements.js" defer></script>
 <script>
   const toggle = document.querySelector("[data-menu-toggle]");
   const menu = document.querySelector("[data-menu]");
