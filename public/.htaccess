@@ -1,20 +1,27 @@
 DirectoryIndex index.html
 
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresByType text/css "access plus 1 year"
+  ExpiresByType application/javascript "access plus 1 year"
+  ExpiresByType image/webp "access plus 30 days"
+  ExpiresByType image/avif "access plus 30 days"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/jpeg "access plus 30 days"
+  ExpiresByType image/gif "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
 <IfModule mod_headers.c>
-  # HTML changes must be visible immediately after each GitHub deploy.
-  # SiteGround documents Cache-Control: private for disabling server-side cache
-  # on non-WordPress sites. X-Accel-Expires: 0 also prevents CDN edge caching.
+  # HTML should always be revalidated before a cached copy is reused.
+  # This matches the cache model already working on vedonlyontibonukset.org.
   <FilesMatch "\.html$">
-    Header always set Cache-Control "private, no-cache, no-store, max-age=0, must-revalidate"
-    Header always set X-Accel-Expires "0"
-    Header always set Pragma "no-cache"
-    Header always set Expires "0"
+    Header always set Cache-Control "public, max-age=0, must-revalidate"
   </FilesMatch>
 
-  # The MGA registry snapshot is regenerated on deploy and must not go stale.
+  # The MGA registry is regenerated automatically and should never go stale.
   <Files "mga-sites.json">
-    Header always set Cache-Control "private, no-cache, no-store, max-age=0, must-revalidate"
-    Header always set X-Accel-Expires "0"
+    Header always set Cache-Control "no-cache, no-store, max-age=0, must-revalidate"
     Header always set Pragma "no-cache"
     Header always set Expires "0"
   </Files>
