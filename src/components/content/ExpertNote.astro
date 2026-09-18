@@ -1,0 +1,16 @@
+---
+interface Props { title?: string; text: string; source?: string }
+const { title = "Toimituksen huomio", text, source } = Astro.props;
+---
+<aside class="expert-note">
+  <div class="expert-note__rule"></div>
+  <div>
+    <span>TOIMITUKSEN HUOMIO</span>
+    <h3>{title}</h3>
+    <p>{text}</p>
+    {source && <small>{source}</small>}
+  </div>
+</aside>
+<style>
+.expert-note{margin:42px 0 50px;display:grid;grid-template-columns:4px 1fr;gap:22px;padding:8px 0}.expert-note__rule{background:linear-gradient(180deg,#ff8a1f,rgba(255,138,31,.08));border-radius:999px}.expert-note span{color:#ffab5d;font-size:11px;font-weight:900;letter-spacing:.13em}.expert-note h3{margin:6px 0 8px;color:#fff;font-size:24px;letter-spacing:-.02em}.expert-note p{margin:0;color:#c5d0dc;line-height:1.7}.expert-note small{display:block;margin-top:10px;color:#7f94a8}
+</style>
