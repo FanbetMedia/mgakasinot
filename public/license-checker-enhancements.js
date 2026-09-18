@@ -1,22 +1,5 @@
 (() => {
-  const checkerRecords = [
-    {
-      domains: ["bet365.com"],
-      status: "mga",
-      label: "MGA-lisenssitieto löytyi paikallisesta tarkistusdatasta",
-      operator: "Hillside (Sports) ENC / Hillside (Gaming) ENC",
-      licence: "MGA/CRP/531/2018 / MGA/CRP/531/2018-02",
-      verification: "https://authorisation.mga.org.mt/verification.aspx?company=671c2548-ec97-4aa3-9339-442fc68a6e44&details=1&lang=en",
-      brand: "Bet365"
-    },
-    {
-      domains: ["rizk.com", "guts.com"],
-      status: "mga",
-      label: "MGA-lisenssi löytyi paikallisesta tarkistusdatasta",
-      operator: "Zecure Gaming Limited",
-      licence: "MGA/CRP/1117/2025-02",
-      verification: "https://authorisation.mga.org.mt/verification.aspx?company=894fb754-8605-4c2d-8bbe-2febe0ac4dd1&details=1&lang=EN"
-    },
+  const nonMgaRecords = [
     {
       domains: ["kanuuna.com"],
       status: "other",
@@ -51,6 +34,9 @@
     }
   ];
 
+  const OFFICIAL_REGISTER = "https://www.mga.org.mt/licensee-hub/licensee-register/";
+  const OFFICIAL_URL_CHECKER = "https://mgaurlchecker.mga.org.mt/";
+
   const normaliseDomain = (value) => {
     const trimmed = String(value || "").trim().toLowerCase();
     if (!trimmed) return "";
@@ -66,6 +52,13 @@
         .replace(/\.$/, "");
     }
   };
+
+  const escapeHtml = (value) => String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
   const distance = (a, b) => {
     if (a === b) return 0;
@@ -86,47 +79,77 @@
     return previous[b.length];
   };
 
-  const allDomains = checkerRecords.flatMap((record) => record.domains.map((domain) => ({ domain, record })));
+  const rootish = (domain) => domain.split(".").slice(-2).join(".");
 
-  const findSuggestion = (domain) => {
+  const loadRegistry = async () => {
+    try {
+      const response = await fetch("/mga-sites.json", { cache: "no-store" });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const payload = await response.json();
+      if (!payload || !Array.isArray(payload.entries)) throw new Error("Invalid MGA registry payload");
+      return {
+        entries: payload.entries
+          .map((entry) => ({ ...entry, domain: normaliseDomain(entry.domain) }))
+          .filter((entry) => entry.domain),
+        generatedAt: payload.generatedAt || "",
+        count: Number(payload.count || payload.entries.length || 0),
+      };
+    } catch (error) {
+      console.warn("MGA registry snapshot could not be loaded", error);
+      return { entries: [], generatedAt: "", count: 0 };
+    }
+  };
+
+  const findRelated = (domain, entries) => {
+    const base = rootish(domain);
+    return entries.filter((entry) => entry.domain !== domain && rootish(entry.domain) === base);
+  };
+
+  const findSuggestion = (domain, entries) => {
     if (!domain || !domain.includes(".")) return null;
     let best = null;
-    for (const candidate of allDomains) {
-      const score = distance(domain, candidate.domain);
-      if (!best || score < best.score) best = { ...candidate, score };
+    for (const entry of entries) {
+      const score = distance(domain, entry.domain);
+      if (!best || score < best.score) best = { entry, score };
     }
     if (!best) return null;
     const maxDistance = domain.length <= 8 ? 1 : 2;
-    return best.score > 0 && best.score <= maxDistance ? best : null;
+    return best.score > 0 && best.score <= maxDistance ? best.entry : null;
   };
 
-  const escapeHtml = (value) => String(value)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-
-  const renderRecord = (result, domain, record, suggested = false) => {
-    const badgeClass = record.status === "mga" ? "result-status result-status--ok" : "result-status result-status--warn";
-    const suggestionLead = suggested
-      ? `<p class="checker-suggestion-lead">Tarkoititko <strong>${escapeHtml(domain)}</strong>? Näytetään tämän domainin tiedot.</p>`
+  const renderMgaRecord = (result, record, registryInfo, suggestionFrom = "") => {
+    const suggestionLead = suggestionFrom
+      ? `<p class="checker-suggestion-lead">Tarkoititko <strong>${escapeHtml(record.domain)}</strong>? Alla ovat tämän domainin MGA-tiedot.</p>`
       : "";
-    const summary = record.brand === "Bet365"
-      ? `<p class="result-summary">Bet365.com löytyy MGA:n rekisteristä Hillside-yhtiöiden alla. Alla näkyvät tarkistusdataan tallennetut nykyiset MGA-lisenssitiedot.</p>`
+    const gameTypes = record.gameTypes
+      ? `<div><dt>Pelityypit</dt><dd>${escapeHtml(record.gameTypes)}</dd></div>`
       : "";
+    const snapshot = registryInfo.generatedAt
+      ? `<p class="result-note">Rekisterisnapshot päivitetty ${escapeHtml(new Date(registryInfo.generatedAt).toLocaleDateString("fi-FI"))}. Tee ennen pelaamista vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssitiedot voivat muuttua.</p>`
+      : `<p class="result-note">Tee ennen pelaamista vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssitiedot voivat muuttua.</p>`;
 
     result.innerHTML = `
       ${suggestionLead}
-      <span class="${badgeClass}">${escapeHtml(record.label)}</span>
+      <span class="result-status result-status--ok">MGA-lisensoitu domain löytyi rekisteristä</span>
+      <strong class="result-domain">${escapeHtml(record.domain)}</strong>
+      <dl>
+        <div><dt>Operaattori</dt><dd>${escapeHtml(record.operator)}</dd></div>
+        <div><dt>Lisenssi</dt><dd>${escapeHtml(record.licence)}</dd></div>
+        ${gameTypes}
+      </dl>
+      <a class="result-source" href="${escapeHtml(record.verification || OFFICIAL_REGISTER)}" target="_blank" rel="noopener noreferrer">Varmenna MGA:n lähteestä ↗</a>
+      ${snapshot}`;
+  };
+
+  const renderOtherRecord = (result, domain, record) => {
+    result.innerHTML = `
+      <span class="result-status result-status--warn">${escapeHtml(record.label)}</span>
       <strong class="result-domain">${escapeHtml(domain)}</strong>
-      ${summary}
       <dl>
         <div><dt>Operaattori</dt><dd>${escapeHtml(record.operator)}</dd></div>
         <div><dt>Lisenssitieto</dt><dd>${escapeHtml(record.licence)}</dd></div>
       </dl>
-      <a class="result-source" href="${escapeHtml(record.verification)}" target="_blank" rel="noopener noreferrer">Avaa MGA-lähde ↗</a>
-      <p class="result-note">Tee vielä lopullinen tarkistus viranomaisen omasta rekisteristä, sillä lisenssistatus ja operaattoritiedot voivat muuttua.</p>`;
+      <a class="result-source" href="${escapeHtml(record.verification)}" target="_blank" rel="noopener noreferrer">Avaa lähde ↗</a>`;
   };
 
   const injectStyles = () => {
@@ -138,12 +161,11 @@
       .checker-suggestion-lead{color:#dbe5ef!important;font-size:15px!important;margin-top:12px!important}
       .checker-suggestion{appearance:none;border:0;background:transparent;color:#ffad63;font:inherit;font-weight:900;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
       .checker-suggestion:hover{color:#fff}
-      .result-summary{color:#c9d4df!important}
     `;
     document.head.appendChild(style);
   };
 
-  const init = () => {
+  const init = async () => {
     const form = document.querySelector("[data-license-form]");
     const result = document.querySelector("[data-license-result]");
     const actions = document.querySelector("[data-checker-actions]");
@@ -154,6 +176,8 @@
     if (!(input instanceof HTMLInputElement)) return;
 
     injectStyles();
+    const registryInfo = await loadRegistry();
+    const mgaEntries = registryInfo.entries;
     let currentDomain = "";
 
     form.addEventListener("submit", (event) => {
@@ -164,36 +188,60 @@
       if (!currentDomain) return;
       input.value = currentDomain;
 
-      const record = checkerRecords.find((item) => item.domains.includes(currentDomain));
-      if (record) {
-        renderRecord(result, currentDomain, record);
+      const exactMga = mgaEntries.find((entry) => entry.domain === currentDomain);
+      if (exactMga) {
+        renderMgaRecord(result, exactMga, registryInfo);
         actions.hidden = false;
         return;
       }
 
-      const suggestion = findSuggestion(currentDomain);
+      const exactOther = nonMgaRecords.find((item) => item.domains.includes(currentDomain));
+      if (exactOther) {
+        renderOtherRecord(result, currentDomain, exactOther);
+        actions.hidden = false;
+        return;
+      }
+
+      const related = findRelated(currentDomain, mgaEntries);
+      if (related.length === 1) {
+        const typedDomain = currentDomain;
+        const match = related[0];
+        result.innerHTML = `
+          <span class="result-status result-status--suggestion">Läheinen MGA-rekisteriosuma löytyi</span>
+          <strong class="result-domain">${escapeHtml(typedDomain)}</strong>
+          <p>MGA-snapshotissa on tähän samaan päädomainiin kuuluva osoite <button type="button" class="checker-suggestion" data-domain-suggestion="${escapeHtml(match.domain)}">${escapeHtml(match.domain)}</button>.</p>`;
+        actions.hidden = false;
+        result.querySelector("[data-domain-suggestion]")?.addEventListener("click", () => {
+          input.value = match.domain;
+          currentDomain = match.domain;
+          renderMgaRecord(result, match, registryInfo, typedDomain);
+        });
+        return;
+      }
+
+      const suggestion = findSuggestion(currentDomain, mgaEntries);
       if (suggestion) {
         const typedDomain = currentDomain;
         result.innerHTML = `
           <span class="result-status result-status--suggestion">Mahdollinen kirjoitusvirhe</span>
           <strong class="result-domain">${escapeHtml(typedDomain)}</strong>
           <p class="checker-suggestion-lead">Tarkoititko <button type="button" class="checker-suggestion" data-domain-suggestion="${escapeHtml(suggestion.domain)}">${escapeHtml(suggestion.domain)}</button>?</p>
-          <p>${suggestion.record.status === "mga" ? `${escapeHtml(suggestion.record.brand || suggestion.domain)} löytyy paikallisesta MGA-tarkistusdatasta lisenssitiedolla ${escapeHtml(suggestion.record.licence)}.` : `${escapeHtml(suggestion.domain)} löytyy paikallisesta tarkistusdatasta.`}</p>`;
+          <p>${escapeHtml(suggestion.domain)} löytyy MGA-rekisterisnapshotista lisenssillä ${escapeHtml(suggestion.licence)}.</p>`;
         actions.hidden = false;
-
-        const suggestionButton = result.querySelector("[data-domain-suggestion]");
-        suggestionButton?.addEventListener("click", () => {
+        result.querySelector("[data-domain-suggestion]")?.addEventListener("click", () => {
           input.value = suggestion.domain;
           currentDomain = suggestion.domain;
-          renderRecord(result, suggestion.domain, suggestion.record, true);
+          renderMgaRecord(result, suggestion, registryInfo, typedDomain);
         });
         return;
       }
 
+      const registryCount = registryInfo.count ? ` (${registryInfo.count} MGA-domainia snapshotissa)` : "";
       result.innerHTML = `
-        <span class="result-status">Ei osumaa paikallisesta tarkistusdatasta</span>
+        <span class="result-status">Ei osumaa MGA-rekisterisnapshotista${escapeHtml(registryCount)}</span>
         <strong class="result-domain">${escapeHtml(currentDomain)}</strong>
-        <p>Tämä ei tarkoita, että kasino olisi lisensoitu tai lisensoimaton. Tarkista domain seuraavaksi virallisen viranomaisen rekisteristä.</p>`;
+        <p>Emme löytäneet tälle domainille täsmäosumaa. Tämä ei yksin tarkoita, että sivusto olisi lisensoimaton. Tarkista osoite vielä MGA:n virallisella URL Checkerilla.</p>
+        <a class="result-source" href="${OFFICIAL_URL_CHECKER}" target="_blank" rel="noopener noreferrer">Avaa MGA URL Checker ↗</a>`;
       actions.hidden = false;
     }, true);
 
