@@ -192,6 +192,23 @@ button,input,textarea,select{font:inherit}
 .score-number{font-size:28px;font-weight:950;color:#fff;line-height:1}
 .score-max{font-size:12px;color:var(--muted);font-weight:750}
 .casino-cta .btn{width:100%}
+.casino-cta .btn-primary{
+  color:#0b1520;
+  text-decoration:none;
+  text-shadow:none;
+  background:linear-gradient(135deg,#ff8a1f,#ffad5c);
+  border-color:rgba(255,255,255,.08);
+  box-shadow:0 12px 28px rgba(255,138,31,.24)
+}
+.content .casino-cta a.btn-primary{
+  color:#0b1520;
+  text-decoration:none
+}
+.casino-cta .btn-primary:hover{
+  color:#07111c;
+  background:linear-gradient(135deg,#ff961f,#ffb66d);
+  box-shadow:0 16px 34px rgba(255,138,31,.30)
+}
 
 .article-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
 .article-card-grid--archive{grid-template-columns:repeat(3,1fr)}

@@ -1,13 +1,12 @@
 const SITE_ORIGIN = "https://mgakasinot.com";
 
-const contextualTargets = [
-  { href: "/uudet-nettikasinot/", anchors: ["uudet nettikasinot", "uudet kasinot"] },
-  { href: "/kasinobonukset/", anchors: ["kasinobonukset", "kasinobonus"] },
-  { href: "/ilmaiskierrokset/", anchors: ["ilmaiskierrokset"] },
-  { href: "/nettikasinot/", anchors: ["nettikasinot", "netti kasinot"] },
-  { href: "/", anchors: ["MGA kasinot"] },
-  { href: "/artikkelit/", anchors: ["artikkelit"] },
-];
+const blockedAnchorsByPath: Record<string, Set<string>> = {
+  "/": new Set(["mga kasinot", "mga-kasinot", "kasinot"]),
+  "/nettikasinot/": new Set(["nettikasinot", "netti kasinot", "kasinot", "parhaat kasinot"]),
+  "/uudet-nettikasinot/": new Set(["uudet nettikasinot", "uudet kasinot", "nettikasinot", "kasinot"]),
+  "/kasinobonukset/": new Set(["kasinobonukset", "kasinobonus", "bonukset"]),
+  "/ilmaiskierrokset/": new Set(["ilmaiskierrokset", "ilmaiskierroksia"]),
+};
 
 function normalizePath(href: string) {
   if (!href) return href;
@@ -36,45 +35,13 @@ function plainText(html: string) {
   return html.replace(/<[^>]*>/g, "").replace(/&nbsp;/gi, " ").replace(/\s+/g, " ").trim();
 }
 
-function escapeRegExp(value: string) {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-function linkFirstPlainOccurrence(html: string, phrase: string, href: string) {
-  let inserted = false;
-
-  return html.replace(/<(p|li)(\s[^>]*)?>([\s\S]*?)<\/\1>/gi, (block, tag, attrs = "", inner) => {
-    if (inserted) return block;
-
-    const tokens = inner.match(/<a\b[\s\S]*?<\/a>|<[^>]+>|[^<]+/gi) ?? [inner];
-    const phrasePattern = new RegExp(
-      `(^|[^\\p{L}\\p{N}])(${escapeRegExp(phrase)})(?![\\p{L}\\p{N}])`,
-      "iu"
-    );
-
-    for (let i = 0; i < tokens.length; i++) {
-      const token = tokens[i];
-      if (token.startsWith("<")) continue;
-      if (!phrasePattern.test(token)) continue;
-
-      tokens[i] = token.replace(
-        phrasePattern,
-        (_match, prefix, matchedPhrase) => `${prefix}<a href="${href}">${matchedPhrase}</a>`
-      );
-      inserted = true;
-      break;
-    }
-
-    return `<${tag}${attrs ?? ""}>${tokens.join("")}</${tag}>`;
-  });
-}
-
 export function buildInternalLinks(html: string, currentPath: string) {
   const canonicalCurrent = pathOnly(currentPath);
   const seenTargets = new Set<string>();
   const anchorToTarget = new Map<string, string>();
+  const blockedAnchors = blockedAnchorsByPath[canonicalCurrent] ?? new Set<string>();
 
-  let output = html.replace(
+  return html.replace(
     /<a\b([^>]*?)href=(["'])([^"']+)\2([^>]*)>([\s\S]*?)<\/a>/gi,
     (full, before, quote, rawHref, after, inner) => {
       const normalizedHref = normalizePath(rawHref);
@@ -87,12 +54,22 @@ export function buildInternalLinks(html: string, currentPath: string) {
 
       if (!isInternal) return full;
 
+      const anchor = plainText(inner).toLocaleLowerCase("fi-FI");
+
+      // Never link the page's own focus phrase, or a generic fragment of it, away
+      // to another URL. This prevents anchors such as "nettikasinot" inside
+      // "uudet nettikasinot" from splitting the keyword/topic signal.
+      if (blockedAnchors.has(anchor)) return inner;
+
+      // Self-links inside editorial copy add no value.
       if (targetPath === canonicalCurrent) return inner;
 
-      const anchor = plainText(inner).toLocaleLowerCase("fi-FI");
       const existingAnchorTarget = anchorToTarget.get(anchor);
 
+      // One editorial link to a destination per source page.
       if (seenTargets.has(targetPath)) return inner;
+
+      // The same visible anchor cannot point to two different internal URLs.
       if (existingAnchorTarget && existingAnchorTarget !== targetPath) return inner;
 
       seenTargets.add(targetPath);
@@ -101,28 +78,4 @@ export function buildInternalLinks(html: string, currentPath: string) {
       return `<a${before}href=${quote}${normalizedHref}${quote}${after}>${inner}</a>`;
     }
   );
-
-  let autoAdded = 0;
-  const maxAutoLinks = 4;
-
-  for (const target of contextualTargets) {
-    if (autoAdded >= maxAutoLinks) break;
-    if (pathOnly(target.href) === canonicalCurrent || seenTargets.has(pathOnly(target.href))) continue;
-
-    for (const anchor of target.anchors) {
-      const anchorKey = anchor.toLocaleLowerCase("fi-FI");
-      if (anchorToTarget.has(anchorKey)) continue;
-
-      const next = linkFirstPlainOccurrence(output, anchor, target.href);
-      if (next !== output) {
-        output = next;
-        seenTargets.add(pathOnly(target.href));
-        anchorToTarget.set(anchorKey, pathOnly(target.href));
-        autoAdded++;
-        break;
-      }
-    }
-  }
-
-  return output;
 }
