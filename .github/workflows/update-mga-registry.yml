@@ -1,0 +1,95 @@
+name: Update MGA registry
+
+on:
+  schedule:
+    # GitHub cron uses UTC. Running at both 09:00 and 10:00 UTC lets the
+    # Helsinki-time guard below keep this at 12:00 through DST changes.
+    - cron: '0 9 * * *'
+    - cron: '0 10 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: mga-registry-update
+  cancel-in-progress: true
+
+jobs:
+  update-registry:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Helsinki time
+        id: timecheck
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] || [ "$(TZ=Europe/Helsinki date +%H)" = "12" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "Updating MGA registry at $(TZ=Europe/Helsinki date '+%Y-%m-%d %H:%M %Z')"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "Skipping: local Helsinki time is $(TZ=Europe/Helsinki date '+%Y-%m-%d %H:%M %Z')"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.timecheck.outputs.run == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.timecheck.outputs.run == 'true'
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        if: steps.timecheck.outputs.run == 'true'
+        run: npm install
+
+      - name: Sync and validate MGA registry
+        if: steps.timecheck.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          npm run sync:mga
+          node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync("public/mga-sites.json","utf8")); if(!Array.isArray(d.entries)||d.entries.length<300) throw new Error(`Only ${d.entries?.length||0} MGA domains found`); for(const x of ["casimba.com","bet365.com"]) if(!d.entries.some(e=>e.domain===x)) throw new Error(`Missing required domain ${x}`); console.log(`Validated ${d.entries.length} MGA domains`);'
+
+      - name: Deploy registry to SiteGround
+        if: steps.timecheck.outputs.run == 'true'
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SG_SSH_PASSPHRASE }}
+          SSH_HOST: ${{ secrets.SG_SSH_HOST }}
+          SSH_USER: ${{ secrets.SG_SSH_USER }}
+          SSH_PORT: ${{ secrets.SG_SSH_PORT }}
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/siteground_key
+          chmod 600 ~/.ssh/siteground_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          cat > ~/.ssh/askpass.sh <<'EOF'
+          #!/bin/sh
+          echo "$SSH_PASSPHRASE"
+          EOF
+          chmod 700 ~/.ssh/askpass.sh
+          export SSH_ASKPASS=~/.ssh/askpass.sh SSH_ASKPASS_REQUIRE=force DISPLAY=:0 SSH_PASSPHRASE
+          setsid ssh-add ~/.ssh/siteground_key </dev/null
+
+          rsync -az -e "ssh -p $SSH_PORT" \
+            public/mga-sites.json \
+            "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/mga-sites.json"
+
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
+            set -e
+            test -s /home/customer/www/mgakasinot.com/public_html/mga-sites.json
+            grep -Fq "casimba.com" /home/customer/www/mgakasinot.com/public_html/mga-sites.json
+            grep -Fq "bet365.com" /home/customer/www/mgakasinot.com/public_html/mga-sites.json
+          '
+
+      - name: Verify live registry
+        if: steps.timecheck.outputs.run == 'true'
+        run: |
+          set -euo pipefail
+          tmp="$(mktemp)"
+          curl -fsS --connect-timeout 10 --max-time 30 \
+            "https://mgakasinot.com/mga-sites.json?check=${{ github.run_id }}" \
+            -o "$tmp"
+          grep -Fq 'casimba.com' "$tmp"
+          grep -Fq 'bet365.com' "$tmp"
+          node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync(process.argv[1],"utf8")); if(!Array.isArray(d.entries)||d.entries.length<300) process.exit(1); console.log(`Live MGA registry contains ${d.entries.length} domains`);' "$tmp"
