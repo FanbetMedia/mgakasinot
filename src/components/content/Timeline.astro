@@ -1,0 +1,12 @@
+---
+type Entry = { marker: string; title: string; text: string };
+interface Props { entries: Entry[]; title?: string; label?: string }
+const { entries, title, label = "Aikajana" } = Astro.props;
+---
+<section class="timeline">
+  <div class="timeline__head"><span>{label}</span>{title && <h3>{title}</h3>}</div>
+  <ol>{entries.map((entry)=><li><div class="timeline__marker">{entry.marker}</div><div><strong>{entry.title}</strong><p>{entry.text}</p></div></li>)}</ol>
+</section>
+<style>
+.timeline{margin:42px 0 50px;padding:28px 0;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}.timeline__head{display:flex;justify-content:space-between;gap:20px;align-items:baseline;margin-bottom:14px}.timeline__head span{color:#ffab5d;font-size:11px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.timeline__head h3{margin:0;color:#fff;font-size:24px}.timeline ol{list-style:none;margin:0;padding:0}.timeline li{display:grid;grid-template-columns:86px 1fr;gap:20px;position:relative;padding:17px 0}.timeline li+li{border-top:1px solid rgba(255,255,255,.08)}.timeline__marker{color:#ff9f47;font-size:12px;font-weight:950;letter-spacing:.08em}.timeline strong{display:block;color:#fff}.timeline p{margin:4px 0 0;color:#9fb0c1;font-size:14px}
+</style>
