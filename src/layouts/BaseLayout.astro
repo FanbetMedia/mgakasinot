@@ -175,8 +175,10 @@ const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
     });
 
     menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
-    window.addEventListener("resize", () => {
-      if (window.innerWidth > 920) closeMenu();
+
+    const desktopQuery = window.matchMedia("(min-width: 921px)");
+    desktopQuery.addEventListener("change", (event) => {
+      if (event.matches) closeMenu();
     });
   }
 </script>
