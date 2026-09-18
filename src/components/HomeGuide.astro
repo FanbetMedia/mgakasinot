@@ -1,0 +1,451 @@
+---
+import { brands } from "../data/site";
+
+const knownChecks = [
+  {
+    domains: ["rizk.com", "www.rizk.com", "guts.com", "www.guts.com"],
+    status: "mga",
+    label: "MGA-lisenssi löytyi paikallisesta tarkistusdatasta",
+    operator: "Zecure Gaming Limited",
+    licence: "MGA/CRP/1117/2025-02",
+    verification: "https://authorisation.mga.org.mt/verification.aspx?company=894fb754-8605-4c2d-8bbe-2febe0ac4dd1&details=1&lang=EN"
+  },
+  {
+    domains: ["kanuuna.com", "www.kanuuna.com"],
+    status: "other",
+    label: "Ei MGA-lisenssiä paikallisen tiedon perusteella",
+    operator: "Blixx Gaming Ltd",
+    licence: "Viron EMTA: HKL000470 / HKT000089",
+    verification: "https://www.emta.ee/en/business-client/registration-business/gambling-operators/list-legal-gambling-operators"
+  },
+  {
+    domains: ["lataamo.com", "www.lataamo.com"],
+    status: "other",
+    label: "Ei MGA-lisenssiä paikallisen tiedon perusteella",
+    operator: "Vana Lauri OÜ",
+    licence: "Viron EMTA",
+    verification: "https://www.emta.ee/en/business-client/registration-business/gambling-operators/list-legal-gambling-operators"
+  },
+  {
+    domains: ["respincasino.fi", "www.respincasino.fi"],
+    status: "other",
+    label: "Ei MGA-lisenssiä paikallisen tiedon perusteella",
+    operator: "Ducks In A Row OÜ",
+    licence: "Viron EMTA: HKL000444",
+    verification: "https://www.emta.ee/en/business-client/registration-business/gambling-operators/list-legal-gambling-operators"
+  },
+  {
+    domains: ["refuelcasino.io", "www.refuelcasino.io", "unlimitcasino.io", "www.unlimitcasino.io", "mountgold.io", "www.mountgold.io"],
+    status: "other",
+    label: "Ei MGA-lisenssiä paikallisen tiedon perusteella",
+    operator: "Hundise Limited",
+    licence: "Anjouan: ALSI-202506036-FI2",
+    verification: "https://www.mga.org.mt/licensee-hub/licensee-register/"
+  }
+];
+---
+
+<div class="guide-shell">
+  <nav class="guide-index" aria-label="MGA-oppaan pikalinkit">
+    <span class="guide-index__label">Tällä sivulla</span>
+    <a href="#mga-pahkinankuoressa">MGA lyhyesti</a>
+    <a href="#pelitapa">Pikakasino vai perinteinen?</a>
+    <a href="#license-checker">License Checker</a>
+    <a href="#verotus">Verotus</a>
+    <a href="#valitse-kasino">Valitse kasino</a>
+    <a href="#ongelmatilanteet">Ongelmatilanteet</a>
+  </nav>
+
+  <section class="guide-section guide-section--intro" id="mga-pahkinankuoressa">
+    <div class="section-copy">
+      <span class="section-number">01</span>
+      <p class="section-kicker">MGA 30 sekunnissa</p>
+      <h2>Mitä MGA-lisenssi käytännössä tarkoittaa?</h2>
+      <p>MGA eli Malta Gaming Authority valvoo Maltalla lisensoituja rahapeliyhtiöitä. Pelaajan kannalta olennaista ei ole pelkkä MGA-logo, vaan se, että juuri kyseinen domain ja sitä operoiva yhtiö löytyvät viranomaisen rekisteristä.</p>
+    </div>
+
+    <div class="fact-lines" aria-label="MGA-lisenssin tärkeimmät ominaisuudet">
+      <div><strong>01</strong><span>Operaattori ja domain voidaan tarkistaa rekisteristä</span></div>
+      <div><strong>02</strong><span>Lisenssin status voi muuttua, joten tarkistus kannattaa tehdä ajantasaisesti</span></div>
+      <div><strong>03</strong><span>MGA edellyttää vastuullisen pelaamisen ja pelaajansuojan käytäntöjä</span></div>
+      <div><strong>04</strong><span>Riitatilanteissa pelaajalla on virallinen valitusreitti</span></div>
+    </div>
+  </section>
+
+  <section class="guide-section guide-section--split" id="pelitapa">
+    <div class="section-copy section-copy--sticky">
+      <span class="section-number">02</span>
+      <p class="section-kicker">Pelitapa</p>
+      <h2>Pikakasino vai perinteinen MGA-kasino?</h2>
+      <p>Sama lisenssi ei tarkoita samanlaista käyttökokemusta. Valitse ensin tapa, jolla haluat tunnistautua ja hoitaa maksut.</p>
+    </div>
+
+    <div class="tabs" data-tabs>
+      <div class="tab-list" role="tablist" aria-label="Kasinoiden pelitavat">
+        <button class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="panel-fast" id="tab-fast" data-tab="fast">Pikakasino</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="panel-classic" id="tab-classic" data-tab="classic">Perinteinen kasino</button>
+      </div>
+      <div class="tab-panel is-active" id="panel-fast" role="tabpanel" aria-labelledby="tab-fast" data-panel="fast">
+        <p class="panel-lead">Nopea aloitus verkkopankkitunnuksilla.</p>
+        <ul class="line-list">
+          <li><span>01</span><div><strong>Tunnistautuminen</strong><p>Pankkitunnuksilla maksun yhteydessä.</p></div></li>
+          <li><span>02</span><div><strong>Käyttäjätili</strong><p>Syntyy usein taustalla ilman pitkää rekisteröintilomaketta.</p></div></li>
+          <li><span>03</span><div><strong>Maksaminen</strong><p>Tyypillisesti suoralla pankkimaksulla.</p></div></li>
+          <li><span>04</span><div><strong>Sopii sinulle, jos</strong><p>Arvostat mahdollisimman vähäistä säätöä.</p></div></li>
+        </ul>
+      </div>
+      <div class="tab-panel" id="panel-classic" role="tabpanel" aria-labelledby="tab-classic" data-panel="classic" hidden>
+        <p class="panel-lead">Tavallinen käyttäjätili ja laajempi tilinhallinta.</p>
+        <ul class="line-list">
+          <li><span>01</span><div><strong>Rekisteröinti</strong><p>Sähköposti, salasana ja pyydetyt henkilötiedot.</p></div></li>
+          <li><span>02</span><div><strong>Käyttäjätili</strong><p>Oma profiili on näkyvästi hallittavissa.</p></div></li>
+          <li><span>03</span><div><strong>Maksaminen</strong><p>Maksutapoja voi olla pankkisiirtoa enemmän.</p></div></li>
+          <li><span>04</span><div><strong>Sopii sinulle, jos</strong><p>Haluat perinteisen tilin ja enemmän hallintavaihtoehtoja.</p></div></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="process-section" aria-labelledby="pay-n-play-title">
+    <div class="process-heading">
+      <p class="section-kicker">Step by step</p>
+      <h2 id="pay-n-play-title">Näin Pay N Play etenee</h2>
+    </div>
+    <ol class="process-line">
+      <li><span>1</span><div><strong>Valitse kasino</strong><p>Tarkista ensin lisenssi ja domain.</p></div></li>
+      <li><span>2</span><div><strong>Valitse pankki</strong><p>Tunnistaudu omilla verkkopankkitunnuksillasi.</p></div></li>
+      <li><span>3</span><div><strong>Tee talletus</strong><p>Maksupalvelu välittää maksun ja tunnistautumisen.</p></div></li>
+      <li><span>4</span><div><strong>Aloita pelaaminen</strong><p>Pelitili avautuu ilman tavallista lomakerumbaa.</p></div></li>
+    </ol>
+  </section>
+
+  <section class="checker" id="license-checker">
+    <div class="checker-copy">
+      <span class="section-number">03</span>
+      <p class="section-kicker">License Checker</p>
+      <h2>Tarkista kasinon domain ennen pelaamista</h2>
+      <p>Syötä kasinon osoite. Työkalu tarkistaa ensin ylläpitämämme paikallisen tiedon ja ohjaa sen jälkeen viralliseen MGA URL Checkeriin. Virallinen MGA-rekisteri on aina lopullinen lähde lisenssistatukselle.</p>
+      <a class="authority-link" href="https://www.mga.org.mt/licensee-hub/licensee-register/" target="_blank" rel="noopener noreferrer">Avaa MGA Licensee Register ↗</a>
+    </div>
+
+    <div class="checker-tool">
+      <form class="checker-form" data-license-form>
+        <label for="casino-domain">Kasinon domain tai URL</label>
+        <div class="checker-input-row">
+          <input id="casino-domain" name="casino-domain" type="text" inputmode="url" autocomplete="url" placeholder="esim. casino.com" required />
+          <button type="submit">Tarkista</button>
+        </div>
+      </form>
+
+      <div class="checker-result" data-license-result aria-live="polite">
+        <span class="result-status">Syötä domain aloittaaksesi</span>
+        <p>Emme merkitse kasinoa MGA-lisensoiduksi pelkän nimen tai logon perusteella.</p>
+      </div>
+
+      <div class="checker-actions" data-checker-actions hidden>
+        <button type="button" class="copy-domain" data-copy-domain>Kopioi domain</button>
+        <a href="https://mgaurlchecker.mga.org.mt/" target="_blank" rel="noopener noreferrer">Tarkista MGA:n URL Checkerissa ↗</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="guide-section guide-section--tax" id="verotus">
+    <div class="section-copy">
+      <span class="section-number">04</span>
+      <p class="section-kicker">Verotus</p>
+      <h2>Onko voitto Suomessa verovapaa?</h2>
+      <p>Verotuksessa ratkaisevaa on se, missä ja minkä luvan nojalla peli on toimeenpantu. Verohallinnon mukaan ETA-alueella lainmukaisesti toimeenpannusta rahapelistä saatu voitto on Suomessa verovapaata tuloa.</p>
+      <a class="authority-link" href="https://vero.fi/syventavat-vero-ohjeet/kannanotot/209399/muualla-kuin-suomessa-tai-eueta-alueella-jarjestetyista-vedonlyonti-veikkaus--ja-raha-automaattipeleista-saatavien-tulojen-verotus-tuloverolain-mukaan/" target="_blank" rel="noopener noreferrer">Verohallinnon ohje ↗</a>
+    </div>
+
+    <div class="decision-flow" aria-label="Rahapelivoiton verotuksen tarkistuspolku">
+      <div class="decision-node"><span>A</span><div><strong>Missä peli on toimeenpantu?</strong><p>Tarkista operaattori ja lisenssi, älä pelkkää brändin nimeä.</p></div></div>
+      <div class="decision-arrow">↓</div>
+      <div class="decision-node"><span>B</span><div><strong>EU / ETA</strong><p>ETA-alueella lainmukaisesti toimeenpantu arpajaisvoitto on lähtökohtaisesti verovapaa.</p></div></div>
+      <div class="decision-arrow">↓</div>
+      <div class="decision-node decision-node--final"><span>C</span><div><strong>Tarkista aina nykyinen toimija</strong><p>Kasino voi vaihtaa operaattoria tai lisenssiä, joten vanha arvostelu ei riitä.</p></div></div>
+    </div>
+  </section>
+
+  <section class="finder" id="valitse-kasino">
+    <div class="finder-heading">
+      <div>
+        <span class="section-number">05</span>
+        <p class="section-kicker">Pikavalitsin</p>
+        <h2>Rajaa vertailua sen mukaan, mitä etsit</h2>
+      </div>
+      <p>Suodatus käyttää tällä hetkellä sivuston omaa bonus- ja arvosanadataa. Lisenssisuodatusta ei aktivoida ennen kuin jokaiselle brändille on lisätty varmennettu lisenssidata.</p>
+    </div>
+
+    <div class="finder-filters" role="group" aria-label="Kasinovertailun suodatus">
+      <button type="button" class="finder-chip is-active" data-filter="all">Kaikki</button>
+      <button type="button" class="finder-chip" data-filter="top">Arvosana 4.8+</button>
+      <button type="button" class="finder-chip" data-filter="spins">Kierrostarjoukset</button>
+      <button type="button" class="finder-chip" data-filter="bonus">Bonusmaininta</button>
+    </div>
+
+    <div class="finder-results" data-finder-results>
+      {brands.slice(0, 9).map((brand, index) => (
+        <div class="finder-row" data-brand-row data-rating={brand.rating} data-description={brand.description.toLowerCase()}>
+          <span class="finder-rank">{String(index + 1).padStart(2, "0")}</span>
+          <div class="finder-brand"><strong>{brand.name}</strong><span>{brand.description}</span></div>
+          <span class="finder-score">{brand.rating}/5</span>
+          {brand.affiliate ? <a href={brand.affiliate} target="_blank" rel="nofollow sponsored noopener">Siirry kasinolle ↗</a> : <span class="finder-muted">Ei linkkiä</span>}
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="guide-section guide-section--responsible">
+    <div class="section-copy section-copy--sticky">
+      <span class="section-number">06</span>
+      <p class="section-kicker">Pelaamisen hallinta</p>
+      <h2>Työkalut kannattaa tarkistaa jo ennen ensimmäistä talletusta</h2>
+      <p>Vastuullisen pelaamisen asetukset eivät ole vain ongelmatilanteita varten. Rajat toimivat parhaiten silloin, kun ne asetetaan ennakkoon.</p>
+    </div>
+
+    <div class="tabs tabs--quiet" data-tabs>
+      <div class="tab-list" role="tablist" aria-label="Vastuullisen pelaamisen työkalut">
+        <button class="tab-button is-active" type="button" role="tab" aria-selected="true" data-tab="deposit">Talletusraja</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="time">Aikaraja</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="cooloff">Pelitauko</button>
+        <button class="tab-button" type="button" role="tab" aria-selected="false" data-tab="exclude">Itsesulku</button>
+      </div>
+      <div class="tab-panel is-active" data-panel="deposit"><p class="panel-lead">Rajoita, kuinka paljon voit tallettaa ennalta määritetyllä ajanjaksolla.</p></div>
+      <div class="tab-panel" data-panel="time" hidden><p class="panel-lead">Aikaraja auttaa pitämään pelisession pituuden näkyvänä ja hallittavana.</p></div>
+      <div class="tab-panel" data-panel="cooloff" hidden><p class="panel-lead">Pelitauko sulkee pelaamisen määräajaksi ilman pysyvää tilin sulkemista.</p></div>
+      <div class="tab-panel" data-panel="exclude" hidden><p class="panel-lead">Itsesulku on vahvempi keino estää pelaaminen valituksi ajaksi tai pysyvämmin.</p></div>
+    </div>
+  </section>
+
+  <section class="complaint" id="ongelmatilanteet">
+    <div class="complaint-heading">
+      <span class="section-number">07</span>
+      <p class="section-kicker">Ongelmatilanteet</p>
+      <h2>Toimi tässä järjestyksessä, jos kasinon kanssa tulee riita</h2>
+    </div>
+
+    <div class="complaint-layout">
+      <ol class="complaint-steps">
+        <li><span>01</span><div><strong>Asiakaspalvelu</strong><p>Pyydä ongelmaan kirjallinen vastaus.</p></div></li>
+        <li><span>02</span><div><strong>Virallinen reklamaatio</strong><p>Kuvaa tapahtumat, summat ja päivämäärät täsmällisesti.</p></div></li>
+        <li><span>03</span><div><strong>ADR</strong><p>Tarkista kasinon käyttämä hyväksytty riidanratkaisuelin.</p></div></li>
+        <li><span>04</span><div><strong>MGA</strong><p>Tarvittaessa vie asia viranomaisen käsiteltäväksi.</p></div></li>
+      </ol>
+
+      <aside class="evidence-list">
+        <p class="section-kicker">Ota nämä talteen</p>
+        <label><input type="checkbox" /> Sähköpostit ja chat-keskustelut</label>
+        <label><input type="checkbox" /> Tapahtuma- ja maksutunnukset</label>
+        <label><input type="checkbox" /> Kuvakaappaukset</label>
+        <label><input type="checkbox" /> Bonusehdot tapahtumahetkeltä</label>
+        <label><input type="checkbox" /> Kasinon lopullinen kirjallinen vastaus</label>
+      </aside>
+    </div>
+  </section>
+</div>
+
+<script is:inline define:vars={{ knownChecks }}>
+  const normaliseDomain = (value) => {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed) return "";
+    try {
+      const url = new URL(trimmed.includes("://") ? trimmed : `https://${trimmed}`);
+      return url.hostname.replace(/^www\./, "");
+    } catch {
+      return trimmed.replace(/^https?:\/\//, "").split("/")[0].replace(/^www\./, "");
+    }
+  };
+
+  document.querySelectorAll("[data-tabs]").forEach((tabs) => {
+    const buttons = tabs.querySelectorAll("[data-tab]");
+    const panels = tabs.querySelectorAll("[data-panel]");
+    buttons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const target = button.dataset.tab;
+        buttons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle("is-active", active);
+          item.setAttribute("aria-selected", String(active));
+        });
+        panels.forEach((panel) => {
+          const active = panel.dataset.panel === target;
+          panel.classList.toggle("is-active", active);
+          panel.hidden = !active;
+        });
+      });
+    });
+  });
+
+  const form = document.querySelector("[data-license-form]");
+  const result = document.querySelector("[data-license-result]");
+  const actions = document.querySelector("[data-checker-actions]");
+  const copyButton = document.querySelector("[data-copy-domain]");
+  let currentDomain = "";
+
+  form?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = form.querySelector("input");
+    currentDomain = normaliseDomain(input.value);
+    if (!currentDomain) return;
+
+    const record = knownChecks.find((item) => item.domains.some((domain) => domain.replace(/^www\./, "") === currentDomain));
+    if (record) {
+      const badgeClass = record.status === "mga" ? "result-status result-status--ok" : "result-status result-status--warn";
+      result.innerHTML = `
+        <span class="${badgeClass}">${record.label}</span>
+        <strong class="result-domain">${currentDomain}</strong>
+        <dl><div><dt>Operaattori</dt><dd>${record.operator}</dd></div><div><dt>Lisenssitieto</dt><dd>${record.licence}</dd></div></dl>
+        <a class="result-source" href="${record.verification}" target="_blank" rel="noopener noreferrer">Avaa lähde ↗</a>
+        <p class="result-note">Tee vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssistatus voi muuttua.</p>`;
+    } else {
+      result.innerHTML = `
+        <span class="result-status">Ei osumaa paikallisesta tarkistusdatasta</span>
+        <strong class="result-domain">${currentDomain}</strong>
+        <p>Tämä ei tarkoita, että kasino olisi lisensoitu tai lisensoimaton. Tarkista domain seuraavaksi virallisella MGA URL Checkerilla.</p>`;
+    }
+    actions.hidden = false;
+  });
+
+  copyButton?.addEventListener("click", async () => {
+    if (!currentDomain) return;
+    try {
+      await navigator.clipboard.writeText(currentDomain);
+      copyButton.textContent = "Kopioitu";
+      setTimeout(() => (copyButton.textContent = "Kopioi domain"), 1400);
+    } catch {
+      copyButton.textContent = currentDomain;
+    }
+  });
+
+  const chips = document.querySelectorAll("[data-filter]");
+  const brandRows = document.querySelectorAll("[data-brand-row]");
+  chips.forEach((chip) => {
+    chip.addEventListener("click", () => {
+      const filter = chip.dataset.filter;
+      chips.forEach((item) => item.classList.toggle("is-active", item === chip));
+      brandRows.forEach((row) => {
+        const rating = Number(row.dataset.rating || 0);
+        const description = row.dataset.description || "";
+        let show = true;
+        if (filter === "top") show = rating >= 4.8;
+        if (filter === "spins") show = description.includes("kierros");
+        if (filter === "bonus") show = description.includes("bonus") || description.includes("€");
+        row.hidden = !show;
+      });
+    });
+  });
+</script>
+
+<style>
+  .guide-shell{width:min(1180px,calc(100% - 36px));margin:0 auto;padding:18px 0 30px}
+  .guide-index{display:flex;align-items:center;gap:8px 22px;flex-wrap:wrap;padding:20px 0 22px;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+  .guide-index__label{color:#ffad63;font-size:12px;font-weight:900;letter-spacing:.11em;text-transform:uppercase;margin-right:8px}
+  .guide-index a{color:#d5dee8;text-decoration:none;font-size:14px;font-weight:750}
+  .guide-index a:hover{color:#fff}
+
+  .guide-section{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:72px;padding:88px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .guide-section--intro{align-items:end}
+  .section-copy{max-width:560px}
+  .section-copy--sticky{align-self:start;position:sticky;top:112px}
+  .section-number{display:block;color:rgba(255,255,255,.26);font-size:13px;font-weight:900;letter-spacing:.16em;margin-bottom:18px}
+  .section-kicker{margin:0 0 10px;color:#ffad63;font-size:12px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+  .section-copy h2,.process-heading h2,.checker h2,.finder h2,.complaint h2{font-size:clamp(30px,4vw,50px);line-height:1.04;letter-spacing:-.04em;margin:0;color:#fff}
+  .section-copy>p:last-of-type,.checker-copy>p,.finder-heading>p{color:#bdc9d6;font-size:16px;line-height:1.75;margin:22px 0 0}
+  .authority-link{display:inline-flex;margin-top:20px;color:#ffad63;text-decoration:none;font-weight:850;font-size:14px}
+
+  .fact-lines{border-top:1px solid rgba(255,255,255,.14)}
+  .fact-lines>div{display:grid;grid-template-columns:54px 1fr;gap:20px;align-items:start;padding:23px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .fact-lines strong{color:#ff9b3d;font-size:12px;letter-spacing:.12em}
+  .fact-lines span{color:#eef3f8;font-size:17px;line-height:1.45}
+
+  .tabs{min-width:0;border-top:1px solid rgba(255,255,255,.14)}
+  .tab-list{display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.12);overflow:auto}
+  .tab-button{appearance:none;border:0;border-bottom:2px solid transparent;background:transparent;color:#91a5b9;padding:18px 22px 16px;font-weight:850;white-space:nowrap;cursor:pointer}
+  .tab-button.is-active{color:#fff;border-bottom-color:#ff8a1f}
+  .tab-panel{padding:30px 0 0}
+  .panel-lead{font-size:21px;line-height:1.45;color:#fff;margin:0 0 22px;font-weight:750}
+  .line-list{list-style:none;margin:0;padding:0}
+  .line-list li{display:grid;grid-template-columns:44px 1fr;gap:18px;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+  .line-list li>span{color:#ff9b3d;font-size:12px;font-weight:900;letter-spacing:.1em;padding-top:4px}
+  .line-list strong{display:block;color:#fff;margin-bottom:4px}
+  .line-list p{margin:0;color:#aebccc}
+
+  .process-section{padding:82px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .process-heading{display:flex;align-items:end;justify-content:space-between;gap:30px;margin-bottom:46px}
+  .process-heading .section-kicker{margin-bottom:0}
+  .process-line{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin:0;padding:0;border-top:1px solid rgba(255,255,255,.14)}
+  .process-line li{position:relative;padding:28px 28px 0 0;border-right:1px solid rgba(255,255,255,.1);min-height:185px}
+  .process-line li+li{padding-left:28px}
+  .process-line li:last-child{border-right:0}
+  .process-line li>span{display:block;color:#ff9b3d;font-size:12px;font-weight:900;margin-bottom:38px}
+  .process-line strong{display:block;color:#fff;font-size:18px;margin-bottom:8px}
+  .process-line p{margin:0;color:#9fb0c1;font-size:14px;line-height:1.55}
+
+  .checker{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:72px;padding:92px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .checker-tool{align-self:center;padding:30px 0 0;border-top:2px solid #ff8a1f}
+  .checker-form label{display:block;color:#c8d3df;font-size:13px;font-weight:800;margin-bottom:10px}
+  .checker-input-row{display:grid;grid-template-columns:1fr auto;border-bottom:1px solid rgba(255,255,255,.2)}
+  .checker-input-row input{width:100%;border:0;background:transparent;color:#fff;font-size:22px;padding:14px 12px 16px 0;outline:none}
+  .checker-input-row input::placeholder{color:#5f7388}
+  .checker-input-row button{border:0;background:#ff8a1f;color:#0a1520;font-weight:950;padding:0 24px;cursor:pointer}
+  .checker-result{min-height:128px;padding:25px 0 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+  .checker-result p{color:#9fb0c1;margin:10px 0 0;line-height:1.55}
+  .result-status{display:inline-flex;color:#d8e0e9;font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase}
+  .result-status--ok{color:#7ce3a1}.result-status--warn{color:#ffc27e}
+  .result-domain{display:block;color:#fff;font-size:24px;margin-top:10px}
+  .checker-result dl{margin:18px 0 0}.checker-result dl>div{display:grid;grid-template-columns:120px 1fr;gap:12px;padding:8px 0}.checker-result dt{color:#70879d;font-size:12px;font-weight:800;text-transform:uppercase}.checker-result dd{margin:0;color:#dce5ee}
+  .result-source{display:inline-flex;color:#ffad63;text-decoration:none;font-weight:850;margin-top:12px;font-size:13px}
+  .result-note{font-size:12px!important}
+  .checker-actions{display:flex;align-items:center;gap:18px;margin-top:18px;flex-wrap:wrap}
+  .checker-actions button,.checker-actions a{background:transparent;border:0;color:#ffad63;font-weight:850;font-size:13px;padding:0;text-decoration:none;cursor:pointer}
+
+  .guide-section--tax{align-items:center}
+  .decision-flow{max-width:620px}
+  .decision-node{display:grid;grid-template-columns:48px 1fr;gap:18px;padding:22px 0;border-top:1px solid rgba(255,255,255,.12)}
+  .decision-node:last-child{border-bottom:1px solid rgba(255,255,255,.12)}
+  .decision-node>span{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;background:rgba(255,138,31,.1);color:#ff9b3d;font-weight:900;font-size:12px}
+  .decision-node strong{color:#fff;font-size:18px}.decision-node p{margin:5px 0 0;color:#aebdcc}
+  .decision-arrow{color:#4f6579;padding:4px 0 4px 15px}
+  .decision-node--final{border-top-color:rgba(255,138,31,.35)}
+
+  .finder{padding:90px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+  .finder-heading{display:grid;grid-template-columns:minmax(0,1fr) minmax(300px,.7fr);gap:70px;align-items:end;margin-bottom:30px}
+  .finder-heading>p{margin:0}
+  .finder-filters{display:flex;gap:8px;flex-wrap:wrap;padding:18px 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+  .finder-chip{border:0;background:transparent;color:#8195a9;padding:8px 12px;font-weight:850;cursor:pointer}
+  .finder-chip.is-active{color:#fff;background:rgba(255,138,31,.1)}
+  .finder-results{margin-top:10px}
+  .finder-row{display:grid;grid-template-columns:56px minmax(0,1fr) 80px 150px;gap:18px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+  .finder-rank{color:#587086;font-size:12px;font-weight:900}.finder-brand strong{display:block;color:#fff;font-size:17px}.finder-brand span{display:block;color:#8fa4b9;font-size:13px;margin-top:3px}.finder-score{color:#ffb36d;font-weight:900}.finder-row a{justify-self:end;color:#ffad63;text-decoration:none;font-weight:850;font-size:13px}.finder-muted{justify-self:end;color:#5c7084;font-size:12px}
+
+  .tabs--quiet .tab-panel{padding-top:38px}
+  .guide-section--responsible{align-items:start}
+
+  .complaint{padding:90px 0 54px}
+  .complaint-heading{max-width:760px;margin-bottom:46px}
+  .complaint-layout{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(280px,.65fr);gap:70px}
+  .complaint-steps{list-style:none;padding:0;margin:0;border-top:1px solid rgba(255,255,255,.13)}
+  .complaint-steps li{display:grid;grid-template-columns:70px 1fr;gap:20px;padding:23px 0;border-bottom:1px solid rgba(255,255,255,.09)}
+  .complaint-steps li>span{color:#ff9b3d;font-size:12px;font-weight:900}.complaint-steps strong{display:block;color:#fff;font-size:18px}.complaint-steps p{margin:5px 0 0;color:#9fb0c1}
+  .evidence-list{padding:24px 0;border-top:2px solid #ff8a1f}
+  .evidence-list label{display:grid;grid-template-columns:18px 1fr;gap:10px;align-items:start;color:#c6d0db;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.08);font-size:14px}
+  .evidence-list input{accent-color:#ff8a1f;margin-top:3px}
+
+  @media (max-width:900px){
+    .guide-section,.checker,.finder-heading,.complaint-layout{grid-template-columns:1fr;gap:38px}
+    .section-copy--sticky{position:static}
+    .process-line{grid-template-columns:1fr 1fr}
+    .process-line li:nth-child(2){border-right:0}.process-line li:nth-child(n+3){border-top:1px solid rgba(255,255,255,.1)}
+  }
+  @media (max-width:620px){
+    .guide-shell{width:min(100% - 28px,1180px)}
+    .guide-index{align-items:flex-start;display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}.guide-index__label{grid-column:1/-1}
+    .guide-section,.checker,.finder,.complaint,.process-section{padding:62px 0}
+    .process-heading{display:block}.process-heading .section-kicker{margin-bottom:10px}
+    .process-line{grid-template-columns:1fr}.process-line li,.process-line li+li{padding:24px 0;border-right:0;border-top:1px solid rgba(255,255,255,.09);min-height:0}.process-line li:first-child{border-top:0}.process-line li>span{margin-bottom:18px}
+    .checker-input-row{grid-template-columns:1fr}.checker-input-row button{min-height:48px;margin-bottom:12px}.checker-result dl>div{grid-template-columns:1fr;gap:2px}
+    .finder-row{grid-template-columns:38px 1fr 60px}.finder-row a,.finder-muted{grid-column:2/-1;justify-self:start}.finder-score{justify-self:end}
+    .tab-list{width:100%}.tab-button{padding-inline:16px}
+  }
+</style>
