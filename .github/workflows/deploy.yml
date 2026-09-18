@@ -38,7 +38,7 @@ jobs:
           grep -Fq '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
 
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || github.head_ref == 'deploy-pagespeed-fixes'
     needs: build
     runs-on: ubuntu-latest
     steps:
