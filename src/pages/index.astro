@@ -1,79 +1,56 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
+import HomeGuide from "../components/HomeGuide.astro";
 import { pages, brands } from "../data/site";
 import { buildInternalLinks } from "../lib/internalLinks";
 import { optimizeContentImages } from "../lib/contentImages";
 
 const page = pages.find((p)=>p.slug === "mga-kasinot")!;
 const marker = '<div data-brand-table></div>';
-const linkedHtml = optimizeContentImages(buildInternalLinks(page.html, "/"));
-const [before, after=''] = linkedHtml.split(marker);
+const deepGuideHtml = optimizeContentImages(buildInternalLinks(page.html.replace(marker, ""), "/"));
 const articles = pages.filter((p)=>p.type === "post").slice(0,3);
 ---
 <BaseLayout title={page.seoTitle} description={page.description} canonical="/">
-  <section class="hero">
-    <div class="shell hero-grid">
-      <div class="hero-copy">
-        <span class="eyebrow">MGA-LISENSSIN ALLA TOIMIVAT KASINOT</span>
+  <section class="home-hero">
+    <div class="shell home-hero__grid">
+      <div class="home-hero__copy">
+        <span class="eyebrow">MGA-LISENSSI • OPAS JA VERTAILU</span>
         <h1>MGA kasinot suomalaisille pelaajille</h1>
-        <p class="hero-lead">Vertaa MGA-lisenssin alla toimivia kasinoita, bonuksia ja ajankohtaisia sisältöjä yhdellä sivustolla.</p>
-        <div class="hero-actions">
+        <p>Vertaa kasinoita, tarkista lisenssin aitous ja ymmärrä, mitä Maltan lisenssi tarkoittaa käytännössä ennen kuin valitset pelipaikan.</p>
+        <div class="home-hero__actions">
           <a class="btn btn-primary btn-large" href="#kasinovertailu">Vertaa kasinoita</a>
-          <a class="btn btn-secondary btn-large" href="/kasinobonukset/">Katso kasinobonukset</a>
+          <a class="home-hero__text-link" href="#license-checker">Tarkista lisenssi →</a>
         </div>
-        <div class="hero-stats">
-          <div><strong>{brands.length}</strong><span>kasinoa vertailussa</span></div>
-          <div><strong>{pages.filter((p)=>p.type === "post").length}</strong><span>artikkelia</span></div>
-          <div><strong>18+</strong><span>pelaa vastuullisesti</span></div>
-        </div>
+        <dl class="home-hero__facts">
+          <div><dt>{brands.length}</dt><dd>brändiä nykyisessä vertailudatassa</dd></div>
+          <div><dt>{pages.filter((p)=>p.type === "post").length}</dt><dd>artikkelia ja opasta</dd></div>
+          <div><dt>18+</dt><dd>pelaa vain rahoilla, jotka voit hävitä</dd></div>
+        </dl>
       </div>
 
-      <div class="hero-visual" aria-hidden="true">
-        <div class="hero-orb hero-orb--one"></div>
-        <div class="hero-orb hero-orb--two"></div>
-        <div class="hero-card hero-card--main">
-          <span>MGA Kasinot</span>
-          <strong>Selkeä vertailu.<br/>Nopea valinta.</strong>
-          <small>Bonukset, lisenssit ja ajankohtaiset artikkelit yhdessä paikassa.</small>
-        </div>
-        <div class="hero-card hero-card--mini">MGA</div>
-        <div class="hero-card hero-card--mini hero-card--mini-2">18+</div>
+      <div class="home-hero__mark" aria-hidden="true">
+        <span class="home-hero__mark-kicker">MALTA GAMING AUTHORITY</span>
+        <strong>MGA</strong>
+        <div class="home-hero__mark-line"></div>
+        <p>Lisenssi ei ole logo.<br/>Tarkista operaattori, domain ja status.</p>
+        <span class="home-hero__mark-year">2026</span>
       </div>
     </div>
-  </section>
-
-  <section class="shell feature-grid" aria-label="Sivuston pääosiot">
-    <a class="feature-card" href="/nettikasinot/">
-      <span class="feature-icon">01</span>
-      <h2>Nettikasinot</h2>
-      <p>Vertaa kasinoita ja niiden tarjouksia samassa näkymässä.</p>
-      <span class="text-link">Avaa vertailu →</span>
-    </a>
-    <a class="feature-card" href="/kasinobonukset/">
-      <span class="feature-icon">02</span>
-      <h2>Kasinobonukset</h2>
-      <p>Tarkista ajankohtaiset bonusvaihtoehdot ja ehdot.</p>
-      <span class="text-link">Katso bonukset →</span>
-    </a>
-    <a class="feature-card" href="/artikkelit/">
-      <span class="feature-icon">03</span>
-      <h2>Artikkelit</h2>
-      <p>Lue oppaita lisensseistä, maksuista ja rahapelialasta.</p>
-      <span class="text-link">Lue artikkelit →</span>
-    </a>
   </section>
 
   <section class="section shell" id="kasinovertailu">
-    <div class="section-heading">
+    <div class="section-heading comparison-heading">
       <div>
         <span class="eyebrow">KASINOVERTAILU</span>
-        <h2>MGA kasinot vertailussa</h2>
+        <h2>Vertaa kasinoita</h2>
       </div>
-      <p>Kasinoiden tiedot perustuvat sivustolle tuotuun Brand Table -dataan.</p>
+      <p>Lisenssitieto kannattaa tarkistaa erikseen ennen pelaamista. Nykyinen brändidata ei vielä sisällä varmennettua lisenssikenttää jokaiselle kasinolle.</p>
     </div>
     <BrandTable />
   </section>
+
+  <HomeGuide />
 
   <section class="section shell article-showcase">
     <div class="section-heading">
@@ -95,10 +72,63 @@ const articles = pages.filter((p)=>p.type === "post").slice(0,3);
     </div>
   </section>
 
-  <section class="section shell">
-    <article class="content content-home">
-      <Fragment set:html={before} />
-      <Fragment set:html={after} />
-    </article>
+  <section class="shell deep-guide-wrap">
+    <details class="deep-guide">
+      <summary>
+        <span>
+          <small>SYVENTÄVÄ OPAS</small>
+          <strong>Lue koko alkuperäinen MGA-opas</strong>
+        </span>
+        <span class="deep-guide__plus" aria-hidden="true">+</span>
+      </summary>
+      <article class="content content-home deep-guide__content">
+        <Fragment set:html={deepGuideHtml} />
+      </article>
+    </details>
   </section>
 </BaseLayout>
+
+<style>
+  .home-hero{padding:76px 0 42px;border-bottom:1px solid rgba(255,255,255,.08);background:radial-gradient(circle at 86% 18%,rgba(255,138,31,.10),transparent 27rem)}
+  .home-hero__grid{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(320px,.68fr);gap:86px;align-items:center;min-height:550px}
+  .home-hero__copy{max-width:760px}
+  .home-hero__copy h1{font-size:clamp(48px,7vw,86px);line-height:.98;letter-spacing:-.055em;margin:0;color:#fff;max-width:820px}
+  .home-hero__copy>p{max-width:690px;color:#bcc9d6;font-size:19px;line-height:1.7;margin:24px 0 0}
+  .home-hero__actions{display:flex;align-items:center;gap:24px;flex-wrap:wrap;margin-top:32px}
+  .home-hero__text-link{color:#ffad63;text-decoration:none;font-size:14px;font-weight:900}
+  .home-hero__facts{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:56px 0 0;border-top:1px solid rgba(255,255,255,.12);border-bottom:1px solid rgba(255,255,255,.12)}
+  .home-hero__facts>div{padding:20px 22px 20px 0;border-right:1px solid rgba(255,255,255,.1)}
+  .home-hero__facts>div+div{padding-left:22px}.home-hero__facts>div:last-child{border-right:0}
+  .home-hero__facts dt{font-size:24px;font-weight:950;color:#fff;line-height:1}.home-hero__facts dd{margin:8px 0 0;color:#7f94a8;font-size:12px;line-height:1.45}
+
+  .home-hero__mark{position:relative;min-height:390px;display:flex;flex-direction:column;justify-content:center;padding:30px 0 20px 44px;border-left:1px solid rgba(255,255,255,.14)}
+  .home-hero__mark-kicker{color:#ffad63;font-size:11px;font-weight:900;letter-spacing:.18em;writing-mode:vertical-rl;position:absolute;right:0;top:20px}
+  .home-hero__mark strong{display:block;font-size:clamp(92px,13vw,176px);line-height:.8;letter-spacing:-.09em;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.46)}
+  .home-hero__mark-line{width:74px;height:3px;background:#ff8a1f;margin:34px 0 22px}
+  .home-hero__mark p{margin:0;color:#c7d2dd;font-size:17px;line-height:1.55}
+  .home-hero__mark-year{position:absolute;right:0;bottom:10px;color:#53697d;font-size:12px;font-weight:900;letter-spacing:.16em}
+
+  .comparison-heading{padding-top:20px}
+  .deep-guide-wrap{padding:30px 0 92px}
+  .deep-guide{border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13)}
+  .deep-guide summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:28px 0}
+  .deep-guide summary::-webkit-details-marker{display:none}
+  .deep-guide summary small{display:block;color:#ffad63;font-size:11px;font-weight:900;letter-spacing:.13em;margin-bottom:5px}
+  .deep-guide summary strong{display:block;color:#fff;font-size:22px;letter-spacing:-.02em}
+  .deep-guide__plus{color:#ff9b3d;font-size:30px;line-height:1;transition:transform .2s ease}
+  .deep-guide[open] .deep-guide__plus{transform:rotate(45deg)}
+  .deep-guide__content{padding-top:28px;padding-bottom:64px}
+
+  @media (max-width:900px){
+    .home-hero__grid{grid-template-columns:1fr;gap:42px;min-height:0}
+    .home-hero__mark{min-height:260px;border-left:0;border-top:1px solid rgba(255,255,255,.13);padding:42px 0 10px}
+    .home-hero__mark-kicker{writing-mode:horizontal-tb;right:auto;top:20px}
+  }
+  @media (max-width:620px){
+    .home-hero{padding-top:52px}
+    .home-hero__copy h1{font-size:clamp(42px,14vw,64px)}
+    .home-hero__facts{grid-template-columns:1fr}.home-hero__facts>div,.home-hero__facts>div+div{padding:15px 0;border-right:0;border-bottom:1px solid rgba(255,255,255,.08)}.home-hero__facts>div:last-child{border-bottom:0}
+    .home-hero__mark strong{font-size:110px}.home-hero__mark-kicker{position:static;margin-bottom:24px}.home-hero__mark-year{bottom:0}
+    .comparison-heading{display:block}.comparison-heading>p{text-align:left;margin-top:14px}
+  }
+</style>
