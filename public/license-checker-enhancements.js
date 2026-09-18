@@ -95,7 +95,7 @@
         count: Number(payload.count || payload.entries.length || 0),
       };
     } catch (error) {
-      console.warn("MGA registry snapshot could not be loaded", error);
+      console.warn("MGA registry data could not be loaded", error);
       return { entries: [], generatedAt: "", count: 0 };
     }
   };
@@ -124,8 +124,8 @@
     const gameTypes = record.gameTypes
       ? `<div><dt>Pelityypit</dt><dd>${escapeHtml(record.gameTypes)}</dd></div>`
       : "";
-    const snapshot = registryInfo.generatedAt
-      ? `<p class="result-note">Rekisterisnapshot päivitetty ${escapeHtml(new Date(registryInfo.generatedAt).toLocaleDateString("fi-FI"))}. Tee ennen pelaamista vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssitiedot voivat muuttua.</p>`
+    const updateNote = registryInfo.generatedAt
+      ? `<p class="result-note">Rekisteri päivitetty ${escapeHtml(new Date(registryInfo.generatedAt).toLocaleDateString("fi-FI"))}. Tee ennen pelaamista vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssitiedot voivat muuttua.</p>`
       : `<p class="result-note">Tee ennen pelaamista vielä lopullinen tarkistus MGA:n omalla URL Checkerilla, sillä lisenssitiedot voivat muuttua.</p>`;
 
     result.innerHTML = `
@@ -138,7 +138,7 @@
         ${gameTypes}
       </dl>
       <a class="result-source" href="${escapeHtml(record.verification || OFFICIAL_REGISTER)}" target="_blank" rel="noopener noreferrer">Varmenna MGA:n lähteestä ↗</a>
-      ${snapshot}`;
+      ${updateNote}`;
   };
 
   const renderOtherRecord = (result, domain, record) => {
@@ -209,7 +209,7 @@
         result.innerHTML = `
           <span class="result-status result-status--suggestion">Läheinen MGA-rekisteriosuma löytyi</span>
           <strong class="result-domain">${escapeHtml(typedDomain)}</strong>
-          <p>MGA-snapshotissa on tähän samaan päädomainiin kuuluva osoite <button type="button" class="checker-suggestion" data-domain-suggestion="${escapeHtml(match.domain)}">${escapeHtml(match.domain)}</button>.</p>`;
+          <p>MGA-rekisterissä on tähän samaan päädomainiin kuuluva osoite <button type="button" class="checker-suggestion" data-domain-suggestion="${escapeHtml(match.domain)}">${escapeHtml(match.domain)}</button>.</p>`;
         actions.hidden = false;
         result.querySelector("[data-domain-suggestion]")?.addEventListener("click", () => {
           input.value = match.domain;
@@ -226,7 +226,7 @@
           <span class="result-status result-status--suggestion">Mahdollinen kirjoitusvirhe</span>
           <strong class="result-domain">${escapeHtml(typedDomain)}</strong>
           <p class="checker-suggestion-lead">Tarkoititko <button type="button" class="checker-suggestion" data-domain-suggestion="${escapeHtml(suggestion.domain)}">${escapeHtml(suggestion.domain)}</button>?</p>
-          <p>${escapeHtml(suggestion.domain)} löytyy MGA-rekisterisnapshotista lisenssillä ${escapeHtml(suggestion.licence)}.</p>`;
+          <p>${escapeHtml(suggestion.domain)} löytyy MGA-rekisteristä lisenssillä ${escapeHtml(suggestion.licence)}.</p>`;
         actions.hidden = false;
         result.querySelector("[data-domain-suggestion]")?.addEventListener("click", () => {
           input.value = suggestion.domain;
@@ -236,9 +236,8 @@
         return;
       }
 
-      const registryCount = registryInfo.count ? ` (${registryInfo.count} MGA-domainia snapshotissa)` : "";
       result.innerHTML = `
-        <span class="result-status">Ei osumaa MGA-rekisterisnapshotista${escapeHtml(registryCount)}</span>
+        <span class="result-status">Ei osumaa MGA-rekisterissä</span>
         <strong class="result-domain">${escapeHtml(currentDomain)}</strong>
         <p>Emme löytäneet tälle domainille täsmäosumaa. Tämä ei yksin tarkoita, että sivusto olisi lisensoimaton. Tarkista osoite vielä MGA:n virallisella URL Checkerilla.</p>
         <a class="result-source" href="${OFFICIAL_URL_CHECKER}" target="_blank" rel="noopener noreferrer">Avaa MGA URL Checker ↗</a>`;
