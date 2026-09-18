@@ -1,0 +1,12 @@
+---
+interface Props { label?: string; title: string; description?: string; href?: string; cta?: string }
+const { label = "TYÖKALU", title, description, href, cta = "Avaa työkalu →" } = Astro.props;
+---
+<section class="toolcard">
+  <div class="toolcard__copy"><span>{label}</span><h3>{title}</h3>{description && <p>{description}</p>}</div>
+  <div class="toolcard__action"><slot />{href && <a href={href}>{cta}</a>}</div>
+</section>
+<style>
+.toolcard{margin:42px 0 54px;display:grid;grid-template-columns:minmax(0,1.1fr) minmax(250px,.9fr);gap:48px;align-items:center;padding:30px 0;border-top:1px solid rgba(255,255,255,.15);border-bottom:1px solid rgba(255,255,255,.15);background:linear-gradient(90deg,rgba(255,138,31,.035),transparent 55%)}.toolcard__copy span{color:#ffab5d;font-size:11px;font-weight:900;letter-spacing:.13em}.toolcard__copy h3{margin:7px 0 10px;color:#fff;font-size:28px;letter-spacing:-.03em}.toolcard__copy p{margin:0;color:#9fb0c1;line-height:1.65}.toolcard__action{display:flex;justify-content:flex-end;align-items:center}.toolcard__action a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 19px;border:1px solid rgba(255,138,31,.3);color:#ffad63;text-decoration:none;font-weight:900;background:rgba(255,138,31,.06)}
+@media(max-width:720px){.toolcard{grid-template-columns:1fr;gap:22px}.toolcard__action{justify-content:flex-start}}
+</style>
