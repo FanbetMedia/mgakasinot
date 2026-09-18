@@ -9,18 +9,41 @@ const articles = pages.filter((p)=>p.type === "post");
   description="MGA Kasinot -sivuston artikkelit rahapelaamisesta, lisensseistä, maksuista ja kasinoalasta."
   canonical="/artikkelit/"
 >
-  <section class="page-hero page-hero--compact">
-    <div class="shell">
-      <span class="eyebrow">ARTIKKELIT</span>
-      <h1>Oppaat ja ajankohtaiset artikkelit</h1>
-      <p>Lue sivuston artikkelit lisensseistä, maksuista ja rahapelialan ilmiöistä.</p>
+  <section class="page-hero page-hero--editorial page-hero--article-archive">
+    <div class="shell page-hero__grid">
+      <div class="page-hero__copy">
+        <span class="eyebrow">ARTIKKELIT</span>
+        <h1>Oppaat ja ajankohtaiset artikkelit</h1>
+        <p>Lue sivuston artikkelit lisensseistä, maksuista ja rahapelialan ilmiöistä.</p>
+        <div class="page-hero__meta" aria-label="Artikkeliarkiston tiedot">
+          <span>{articles.length} artikkelia</span>
+          <span>Suomeksi</span>
+          <span>18+</span>
+        </div>
+      </div>
+
+      <aside class="page-hero__mark" aria-hidden="true">
+        <span class="page-hero__mark-kicker">MGAKASINOT.COM</span>
+        <strong>MGA</strong>
+        <div class="page-hero__mark-line"></div>
+        <p>Ajankohtaisia aiheita, taustaa ja käytännön oppaita selkeässä muodossa.</p>
+        <small>JOURNAL</small>
+      </aside>
     </div>
   </section>
 
-  <section class="section shell">
+  <section class="section shell article-archive">
+    <div class="section-heading article-archive__heading">
+      <div>
+        <span class="eyebrow">KAIKKI SISÄLLÖT</span>
+        <h2>Viimeisimmät julkaisut</h2>
+      </div>
+      <p>Samassa värimaailmassa ja rakenteessa kuin muu MGA Kasinot -sivusto.</p>
+    </div>
+
     <div class="article-card-grid article-card-grid--archive">
-      {articles.map((article) => (
-        <a class="article-card" href={`/${article.slug}/`}>
+      {articles.map((article, index) => (
+        <a class:list={["article-card", `article-card--tone-${(index % 3) + 1}`]} href={`/${article.slug}/`}>
           <span class="article-kicker">Artikkeli</span>
           <h2>{article.title}</h2>
           <p>{article.description || "Lue artikkeli ja tutustu aiheeseen tarkemmin."}</p>
