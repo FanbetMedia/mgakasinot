@@ -1,4 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /wp-admin/
+Disallow: /wp-includes/
+Disallow: /wp-login.php
 
 Sitemap: https://mgakasinot.com/sitemap-index.xml
