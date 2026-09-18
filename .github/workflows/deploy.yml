@@ -57,6 +57,7 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run check:links
+
       - name: Deploy dist to SiteGround
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
@@ -106,7 +107,8 @@ jobs:
             grep -q "application/ld+json" index.html
             grep -q "property=\"og:title\"" index.html
             grep -q "DirectoryIndex index.html" .htaccess
-            grep -Fq "no-cache, max-age=0, must-revalidate" .htaccess
+            grep -Fq "private, no-cache, no-store, max-age=0, must-revalidate" .htaccess
+            grep -Fq "X-Accel-Expires \"0\"" .htaccess
             grep -Fq "max-age=31536000, immutable" .htaccess
             grep -Fq "max-age=2592000" .htaccess
             grep -Fq "User-agent: *" robots.txt
@@ -123,13 +125,13 @@ jobs:
 
           ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "grep -Fq '$PUBLIC_BUILD_SHA' /home/customer/www/mgakasinot.com/public_html/index.html"
 
-      - name: Verify public production is on this commit
+      - name: Verify canonical public homepage is on this commit
         run: |
           set -euo pipefail
-          url="https://mgakasinot.com/?deploy=${PUBLIC_BUILD_SHA}"
+          url="https://mgakasinot.com/"
           success=0
 
-          for attempt in 1 2 3 4 5 6; do
+          for attempt in $(seq 1 20); do
             body="$(mktemp)"
             headers="$(mktemp)"
 
@@ -141,22 +143,28 @@ jobs:
               -D "$headers" \
               "$url" \
               -o "$body"; then
-              if grep -Fq "$PUBLIC_BUILD_SHA" "$body" && grep -Fq 'SYVENTÄVÄ MGA-OPAS' "$body"; then
-                echo "Public production is serving build $PUBLIC_BUILD_SHA"
-                echo "Production cache headers:"
-                grep -i '^cache-control:' "$headers" || true
+              if grep -Fq "$PUBLIC_BUILD_SHA" "$body" \
+                && grep -Fq 'SYVENTÄVÄ MGA-OPAS' "$body" \
+                && grep -Fq 'Koko MGA-opas selkeämpänä kokonaisuutena' "$body"; then
+                echo "Canonical production homepage is serving build $PUBLIC_BUILD_SHA"
+                echo "Relevant production headers:"
+                grep -Ei '^(cache-control|x-accel-expires|x-proxy-cache|x-sg-cdn|age):' "$headers" || true
                 success=1
                 rm -f "$body" "$headers"
                 break
               fi
+
+              echo "Attempt $attempt returned a different homepage build."
+              grep -o 'name="x-build-sha" content="[^"]*"' "$body" || true
+              grep -Ei '^(cache-control|x-accel-expires|x-proxy-cache|x-sg-cdn|age):' "$headers" || true
             fi
 
-            echo "Public production has not exposed build $PUBLIC_BUILD_SHA yet (attempt $attempt)."
             rm -f "$body" "$headers"
             sleep 3
           done
 
           if [ "$success" -ne 1 ]; then
-            echo "Production smoke test failed: https://mgakasinot.com/ is not serving the deployed GitHub commit."
+            echo "Production smoke test failed: canonical https://mgakasinot.com/ is still serving stale HTML."
+            echo "Do not treat this deploy as live until the SiteGround Dynamic Cache/CDN cache has been purged once."
             exit 1
           fi
