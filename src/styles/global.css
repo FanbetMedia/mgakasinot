@@ -250,7 +250,7 @@ button,input,textarea,select{font:inherit}
   margin-top:68px;border-top:1px solid var(--line);
   background:linear-gradient(180deg,#061522,#040d16)
 }
-.footer-grid{display:grid;grid-template-columns:1.4fr repeat(3,1fr);gap:36px;padding:50px 0 34px}
+.footer-grid{display:grid;grid-template-columns:1.45fr .8fr 1fr;gap:42px;padding:50px 0 34px}
 .footer-about p{max-width:430px;color:var(--muted);margin:20px 0}
 .footer-brand{margin-bottom:5px}
 .responsible-row{display:flex;gap:8px;flex-wrap:wrap}
@@ -266,6 +266,18 @@ button,input,textarea,select{font:inherit}
 .footer-column li+li{margin-top:9px}
 .footer-column a{color:var(--muted);text-decoration:none;font-size:13px;line-height:1.45}
 .footer-column a:hover{color:#fff}
+.footer-contact h3{margin:2px 0 15px;font-size:14px;color:#fff;text-transform:uppercase;letter-spacing:.08em}
+.footer-contact p{margin:0 0 14px;color:var(--muted);font-size:13px;max-width:300px}
+.footer-email{
+  display:inline-flex;align-items:center;gap:10px;padding:11px 13px;border-radius:12px;
+  border:1px solid rgba(255,138,31,.22);background:rgba(255,138,31,.07);
+  color:#fff;text-decoration:none;font-weight:850;font-size:13px;transition:.2s ease
+}
+.footer-email:hover{transform:translateY(-1px);border-color:rgba(255,138,31,.42);background:rgba(255,138,31,.11)}
+.footer-email-icon{
+  display:grid;place-items:center;width:28px;height:28px;border-radius:8px;
+  background:linear-gradient(135deg,var(--orange),var(--orange-2));color:#111923;font-weight:950
+}
 .footer-notice{padding:18px 0;border-top:1px solid var(--line)}
 .footer-notice p{margin:0;color:var(--muted);font-size:12px}
 .footer-bottom{border-top:1px solid var(--line)}
@@ -278,7 +290,7 @@ button,input,textarea,select{font:inherit}
   .article-card-grid,.article-card-grid--archive{grid-template-columns:1fr 1fr}
   .casino-card{grid-template-columns:46px 130px minmax(0,1fr) 80px}
   .casino-cta{grid-column:3/5}
-  .footer-grid{grid-template-columns:1.2fr 1fr 1fr}
+  .footer-grid{grid-template-columns:1.2fr 1fr}
   .footer-about{grid-column:1/-1}
 }
 @media(max-width:920px){
@@ -316,6 +328,7 @@ button,input,textarea,select{font:inherit}
   .page-hero{padding:44px 0 32px}
   .footer-grid{grid-template-columns:1fr 1fr;gap:30px 20px}
   .footer-about{grid-column:1/-1}
+  .footer-contact{grid-column:1/-1}
 }
 @media(max-width:500px){
   .brand-name{font-size:18px}

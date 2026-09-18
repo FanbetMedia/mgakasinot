@@ -15,11 +15,6 @@ const canonicalUrl = new URL(canonical, siteUrl).toString();
 const ogImageUrl = new URL(ogImage, siteUrl).toString();
 const schemaType = pageType === "Article" ? "Article" : "WebPage";
 
-const mainSlugs = ["mga-kasinot","nettikasinot","uudet-nettikasinot","ilmaiskierrokset","kasinobonukset"];
-const mainPages = pages.filter((p) => mainSlugs.includes(p.slug));
-const infoPages = pages.filter((p) => p.type === "page" && !mainSlugs.includes(p.slug)).slice(0, 8);
-const articlePages = pages.filter((p) => p.type === "post").slice(0, 7);
-
 const schema = {
   "@context": "https://schema.org",
   "@graph": [
@@ -126,33 +121,25 @@ const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
       </div>
     </section>
 
-    <nav class="footer-column" aria-label="Pääsivut">
-      <h3>Pääsivut</h3>
+    <nav class="footer-column footer-site-links" aria-label="Sivusto">
+      <h3>Sivusto</h3>
       <ul>
-        {mainPages.map((page) => (
-          <li><a href={page.slug === "mga-kasinot" ? "/" : `/${page.slug}/`}>{page.title}</a></li>
-        ))}
+        <li><a href="/nettikasinot/">Nettikasinot</a></li>
+        <li><a href="/uudet-nettikasinot/">Uudet nettikasinot</a></li>
+        <li><a href="/kasinobonukset/">Kasinobonukset</a></li>
+        <li><a href="/ilmaiskierrokset/">Ilmaiskierrokset</a></li>
+        <li><a href="/artikkelit/">Artikkelit</a></li>
       </ul>
     </nav>
 
-    <nav class="footer-column" aria-label="Infosivut">
-      <h3>Infosivut</h3>
-      <ul>
-        {infoPages.map((page) => (
-          <li><a href={`/${page.slug}/`}>{page.title}</a></li>
-        ))}
-      </ul>
-    </nav>
-
-    <nav class="footer-column" aria-label="Artikkelit">
-      <h3>Artikkelit</h3>
-      <ul>
-        <li><a href="/artikkelit/">Kaikki artikkelit</a></li>
-        {articlePages.map((page) => (
-          <li><a href={`/${page.slug}/`}>{page.title}</a></li>
-        ))}
-      </ul>
-    </nav>
+    <section class="footer-contact" aria-labelledby="footer-contact-title">
+      <h3 id="footer-contact-title">Ota yhteyttä</h3>
+      <p>Kysyttävää sivustosta, sisällöistä tai yhteistyöstä?</p>
+      <a class="footer-email" href="mailto:info@mgakasinot.com">
+        <span class="footer-email-icon" aria-hidden="true">@</span>
+        <span>info@mgakasinot.com</span>
+      </a>
+    </section>
   </div>
 
   <div class="shell footer-notice">
