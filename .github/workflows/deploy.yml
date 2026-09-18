@@ -18,7 +18,7 @@ jobs:
       - run: npm install
       - run: npm run build
   deploy:
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || github.head_ref == 'production-deploy-trigger'
     needs: build
     runs-on: ubuntu-latest
     steps:
