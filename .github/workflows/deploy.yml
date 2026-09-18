@@ -52,3 +52,14 @@ jobs:
             rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
           fi
           rsync -az --delete --exclude='.well-known/' --exclude='php_errorlog' --exclude='_astro/' --exclude='wp-content/uploads/' -e "ssh -p $SSH_PORT" dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
+
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
+            set -e
+            cd /home/customer/www/mgakasinot.com/public_html
+            test -s index.html
+            test -s robots.txt
+            test -s sitemap-index.xml
+            grep -q "application/ld+json" index.html
+            grep -q "property=\"og:title\"" index.html
+            grep -q "DirectoryIndex index.html" .htaccess
+          '
