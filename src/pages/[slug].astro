@@ -2,12 +2,38 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
 import { pages } from "../data/site";
-export function getStaticPaths(){ return pages.filter((p)=>p.slug!=='mga-kasinot').map((page)=>({params:{slug:page.slug},props:{page}})); }
+
+export function getStaticPaths(){
+  return pages
+    .filter((p)=>p.slug !== "mga-kasinot")
+    .map((page)=>({params:{slug:page.slug},props:{page}}));
+}
+
 const { page } = Astro.props;
-const marker='<div data-brand-table></div>';
+const marker = '<div data-brand-table></div>';
 const [before, after=''] = page.html.split(marker);
 const hasTable = page.html.includes(marker);
+const isArticle = page.type === "post";
 ---
-<BaseLayout title={page.seoTitle} description={page.description} canonical={`/${page.slug}/`} pageType={page.type === "post" ? "Article" : "WebPage"}>
-<article class="content"><h1>{page.title}</h1><Fragment set:html={before} />{hasTable && <BrandTable />}<Fragment set:html={after} /></article>
+<BaseLayout
+  title={page.seoTitle}
+  description={page.description}
+  canonical={`/${page.slug}/`}
+  pageType={isArticle ? "Article" : "WebPage"}
+>
+  <section class:list={["page-hero", isArticle && "page-hero--article"]}>
+    <div class="shell">
+      <span class="eyebrow">{isArticle ? "ARTIKKELI" : "MGA KASINOT"}</span>
+      <h1>{page.title}</h1>
+      {page.description && <p>{page.description}</p>}
+    </div>
+  </section>
+
+  <section class="section shell">
+    <article class="content">
+      <Fragment set:html={before} />
+      {hasTable && <BrandTable />}
+      <Fragment set:html={after} />
+    </article>
+  </section>
 </BaseLayout>
