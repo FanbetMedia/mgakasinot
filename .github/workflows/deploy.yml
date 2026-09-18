@@ -11,6 +11,9 @@ concurrency:
   group: production-deploy-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PUBLIC_BUILD_SHA: ${{ github.sha }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,8 +25,9 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run check:links
-      - name: Validate indexability
+      - name: Validate indexability and build marker
         run: |
+          set -euo pipefail
           test -s dist/robots.txt
           test -s dist/sitemap-index.xml
           grep -Fq "User-agent: *" dist/robots.txt
@@ -36,6 +40,8 @@ jobs:
           fi
           grep -Fq '<meta name="robots" content="index,follow' dist/index.html
           grep -Fq '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
+          grep -Fq 'name="x-build-sha"' dist/index.html
+          grep -Fq "$PUBLIC_BUILD_SHA" dist/index.html
           grep -Fq 'SYVENTÄVÄ MGA-OPAS' dist/index.html
           grep -Fq 'Koko MGA-opas selkeämpänä kokonaisuutena' dist/index.html
 
@@ -59,6 +65,7 @@ jobs:
           SSH_USER: ${{ secrets.SG_SSH_USER }}
           SSH_PORT: ${{ secrets.SG_SSH_PORT }}
         run: |
+          set -euo pipefail
           mkdir -p ~/.ssh
           printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/siteground_key
           chmod 600 ~/.ssh/siteground_key
@@ -73,6 +80,7 @@ jobs:
           setsid ssh-add ~/.ssh/siteground_key </dev/null
 
           test -f dist/index.html
+          grep -Fq "$PUBLIC_BUILD_SHA" dist/index.html
           grep -Fq 'SYVENTÄVÄ MGA-OPAS' dist/index.html
 
           if [ -d dist/_astro ]; then
@@ -98,7 +106,9 @@ jobs:
             grep -q "application/ld+json" index.html
             grep -q "property=\"og:title\"" index.html
             grep -q "DirectoryIndex index.html" .htaccess
-            grep -Fq "no-cache, must-revalidate" .htaccess
+            grep -Fq "no-cache, max-age=0, must-revalidate" .htaccess
+            grep -Fq "max-age=31536000, immutable" .htaccess
+            grep -Fq "max-age=2592000" .htaccess
             grep -Fq "User-agent: *" robots.txt
             grep -Fq "Allow: /" robots.txt
             grep -Fq "Sitemap: https://mgakasinot.com/sitemap-index.xml" robots.txt
@@ -110,3 +120,43 @@ jobs:
             grep -q "<meta name=\"robots\" content=\"index,follow" index.html
             grep -q "<link rel=\"canonical\" href=\"https://mgakasinot.com/\"" index.html
           '
+
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" "grep -Fq '$PUBLIC_BUILD_SHA' /home/customer/www/mgakasinot.com/public_html/index.html"
+
+      - name: Verify public production is on this commit
+        run: |
+          set -euo pipefail
+          url="https://mgakasinot.com/?deploy=${PUBLIC_BUILD_SHA}"
+          success=0
+
+          for attempt in 1 2 3 4 5 6; do
+            body="$(mktemp)"
+            headers="$(mktemp)"
+
+            if curl -fsS \
+              --connect-timeout 10 \
+              --max-time 30 \
+              -H 'Cache-Control: no-cache' \
+              -H 'Pragma: no-cache' \
+              -D "$headers" \
+              "$url" \
+              -o "$body"; then
+              if grep -Fq "$PUBLIC_BUILD_SHA" "$body" && grep -Fq 'SYVENTÄVÄ MGA-OPAS' "$body"; then
+                echo "Public production is serving build $PUBLIC_BUILD_SHA"
+                echo "Production cache headers:"
+                grep -i '^cache-control:' "$headers" || true
+                success=1
+                rm -f "$body" "$headers"
+                break
+              fi
+            fi
+
+            echo "Public production has not exposed build $PUBLIC_BUILD_SHA yet (attempt $attempt)."
+            rm -f "$body" "$headers"
+            sleep 3
+          done
+
+          if [ "$success" -ne 1 ]; then
+            echo "Production smoke test failed: https://mgakasinot.com/ is not serving the deployed GitHub commit."
+            exit 1
+          fi
