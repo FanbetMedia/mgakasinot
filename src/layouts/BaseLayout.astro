@@ -1,0 +1,20 @@
+---
+import "../styles/global.css";
+const { title, description = "", canonical = Astro.url.pathname } = Astro.props;
+const canonicalUrl = new URL(canonical, Astro.site ?? Astro.url.origin).toString();
+---
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<title>{title}</title>
+{description && <meta name="description" content={description} />}
+<link rel="canonical" href={canonicalUrl} />
+<meta name="robots" content="index,follow,max-image-preview:large" />
+</head>
+<body>
+<header class="site-header"><div class="shell header-inner"><a class="brand" href="/">MGA Kasinot</a><nav><a href="/nettikasinot/">NETTIKASINOT</a><a href="/uudet-nettikasinot/">UUDET NETTIKASINOT</a><a href="/ilmaiskierrokset/">ILMAISKIERROKSET</a><a href="/kasinobonukset/">KASINOBONUKSET</a></nav></div></header>
+<main class="shell"><slot /></main>
+<footer><div class="shell">© {new Date().getFullYear()} MGA Kasinot</div></footer>
+</body></html>
