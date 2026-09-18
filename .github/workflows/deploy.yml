@@ -36,6 +36,8 @@ jobs:
           fi
           grep -Fq '<meta name="robots" content="index,follow' dist/index.html
           grep -Fq '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
+          grep -Fq 'SYVENTÄVÄ MGA-OPAS' dist/index.html
+          grep -Fq 'Koko MGA-opas selkeämpänä kokonaisuutena' dist/index.html
 
   deploy:
     if: github.event_name != 'pull_request'
@@ -71,12 +73,19 @@ jobs:
           setsid ssh-add ~/.ssh/siteground_key </dev/null
 
           test -f dist/index.html
+          grep -Fq 'SYVENTÄVÄ MGA-OPAS' dist/index.html
 
           if [ -d dist/_astro ]; then
             rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
           fi
 
-          rsync -az --delete             --exclude='.well-known/'             --exclude='php_errorlog'             --exclude='_astro/'             --exclude='wp-content/uploads/'             -e "ssh -p $SSH_PORT"             dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
+          rsync -az --delete \
+            --exclude='.well-known/' \
+            --exclude='php_errorlog' \
+            --exclude='_astro/' \
+            --exclude='wp-content/uploads/' \
+            -e "ssh -p $SSH_PORT" \
+            dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
 
           ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
             set -e
@@ -84,9 +93,12 @@ jobs:
             test -s index.html
             test -s robots.txt
             test -s sitemap-index.xml
+            grep -Fq "SYVENTÄVÄ MGA-OPAS" index.html
+            grep -Fq "Koko MGA-opas selkeämpänä kokonaisuutena" index.html
             grep -q "application/ld+json" index.html
             grep -q "property=\"og:title\"" index.html
             grep -q "DirectoryIndex index.html" .htaccess
+            grep -Fq "no-cache, must-revalidate" .htaccess
             grep -Fq "User-agent: *" robots.txt
             grep -Fq "Allow: /" robots.txt
             grep -Fq "Sitemap: https://mgakasinot.com/sitemap-index.xml" robots.txt
