@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-09-18T16:45:00.000Z",
+  "source": "seed",
+  "officialRegister": "https://www.mga.org.mt/licensee-hub/licensee-register/",
+  "officialUrlChecker": "https://mgaurlchecker.mga.org.mt/",
+  "count": 5,
+  "entries": [
+    {
+      "domain": "bet365.com",
+      "operator": "Hillside (Sports) ENC / Hillside (Gaming) ENC",
+      "licence": "MGA/CRP/531/2018 / MGA/CRP/531/2018-02",
+      "status": "Licensed",
+      "gameTypes": "Type 1, Type 2, Type 3",
+      "verification": "https://www.mga.org.mt/licensee-hub/licensee-register/",
+      "source": "manual official verification"
+    },
+    {
+      "domain": "casimba.com",
+      "operator": "White Hat Gaming Limited",
+      "licence": "MGA/B2C/370/2017",
+      "status": "Licensed",
+      "gameTypes": "Type 1, Type 2, Type 3",
+      "verification": "https://authorisation.mga.org.mt/verification.aspx?company=633683dc-daea-49e5-9a7e-da843d38e7de&details=1&lang=EN",
+      "source": "manual official verification"
+    },
+    {
+      "domain": "leovegas.com",
+      "operator": "LeoVegas Gaming plc",
+      "licence": "MGA/CRP/237/2013",
+      "status": "Licensed",
+      "gameTypes": "",
+      "verification": "https://www.mga.org.mt/licensee-hub/licensee-register/",
+      "source": "manual official verification"
+    },
+    {
+      "domain": "guts.com",
+      "operator": "Zecure Gaming Limited",
+      "licence": "MGA/CRP/1117/2025-02",
+      "status": "Licensed",
+      "gameTypes": "",
+      "verification": "https://authorisation.mga.org.mt/verification.aspx?company=894fb754-8605-4c2d-8bbe-2febe0ac4dd1&details=1&lang=EN",
+      "source": "manual official verification"
+    },
+    {
+      "domain": "rizk.com",
+      "operator": "Zecure Gaming Limited",
+      "licence": "MGA/CRP/1117/2025-02",
+      "status": "Licensed",
+      "gameTypes": "",
+      "verification": "https://authorisation.mga.org.mt/verification.aspx?company=894fb754-8605-4c2d-8bbe-2febe0ac4dd1&details=1&lang=EN",
+      "source": "manual official verification"
+    }
+  ]
+}
