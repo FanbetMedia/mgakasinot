@@ -1,0 +1,13 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BrandTable from "../components/BrandTable.astro";
+import { pages } from "../data/site";
+export function getStaticPaths(){ return pages.filter((p)=>p.slug!=='mga-kasinot').map((page)=>({params:{slug:page.slug},props:{page}})); }
+const { page } = Astro.props;
+const marker='<div data-brand-table></div>';
+const [before, after=''] = page.html.split(marker);
+const hasTable = page.html.includes(marker);
+---
+<BaseLayout title={page.seoTitle} description={page.description} canonical={`/${page.slug}/`} pageType={page.type === "post" ? "Article" : "WebPage"}>
+<article class="content"><h1>{page.title}</h1><Fragment set:html={before} />{hasTable && <BrandTable />}<Fragment set:html={after} /></article>
+</BaseLayout>

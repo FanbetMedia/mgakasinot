@@ -1,0 +1,11 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import BrandTable from "../components/BrandTable.astro";
+import { pages } from "../data/site";
+const page = pages.find((p)=>p.slug==='mga-kasinot')!;
+const marker='<div data-brand-table></div>';
+const [before, after=''] = page.html.split(marker);
+---
+<BaseLayout title={page.seoTitle} description={page.description} canonical="/">
+<article class="content"><h1>{page.title}</h1><Fragment set:html={before} /><BrandTable /><Fragment set:html={after} /></article>
+</BaseLayout>

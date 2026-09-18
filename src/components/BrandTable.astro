@@ -1,0 +1,12 @@
+---
+import { brands } from "../data/site";
+---
+<section class="brand-list" aria-label="MGA kasinot">
+{brands.map((brand, i) => <article class="casino-card">
+  <div class="rank">{i+1}</div>
+  <div class="casino-logo">{brand.logo ? <img src={brand.logo.replace('https://mgakasinot.com','')} alt={brand.name} loading={i<2?'eager':'lazy'} /> : <strong>{brand.name}</strong>}</div>
+  <div class="casino-main"><span class="bonus-label">Talletusbonus</span><strong class="bonus">{brand.description}</strong><ul>{brand.pros.map((p)=><li>{p}</li>)}</ul></div>
+  <div class="casino-score"><strong>{brand.name}</strong><span>{brand.rating}/10</span></div>
+  <div class="casino-cta">{brand.affiliate ? <a href={brand.affiliate} rel="nofollow sponsored" target="_blank">SIIRRY KASINOLLE</a> : <span class="disabled">EI LINKKIÄ</span>}</div>
+</article>)}
+</section>

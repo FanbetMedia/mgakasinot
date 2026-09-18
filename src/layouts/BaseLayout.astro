@@ -1,0 +1,82 @@
+---
+import "../styles/global.css";
+
+const {
+  title,
+  description = "",
+  canonical = Astro.url.pathname,
+  pageType = "WebPage",
+  ogImage = "/wp-content/uploads/2024/07/cropped-AdobeStock_509234975-scaled-1.jpeg",
+} = Astro.props;
+
+const siteUrl = Astro.site ?? new URL("https://mgakasinot.com");
+const canonicalUrl = new URL(canonical, siteUrl).toString();
+const ogImageUrl = new URL(ogImage, siteUrl).toString();
+const schemaType = pageType === "Article" ? "Article" : "WebPage";
+
+const schema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://mgakasinot.com/#organization",
+      name: "MGA Kasinot",
+      url: "https://mgakasinot.com/",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://mgakasinot.com/#website",
+      url: "https://mgakasinot.com/",
+      name: "MGA Kasinot",
+      inLanguage: "fi-FI",
+      publisher: { "@id": "https://mgakasinot.com/#organization" },
+    },
+    {
+      "@type": schemaType,
+      "@id": `${canonicalUrl}#webpage`,
+      url: canonicalUrl,
+      name: title,
+      ...(description ? { description } : {}),
+      inLanguage: "fi-FI",
+      isPartOf: { "@id": "https://mgakasinot.com/#website" },
+      ...(schemaType === "Article" ? {
+        headline: title,
+        publisher: { "@id": "https://mgakasinot.com/#organization" }
+      } : {}),
+    },
+  ],
+};
+const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
+---
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+<title>{title}</title>
+{description && <meta name="description" content={description} />}
+<meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+<link rel="canonical" href={canonicalUrl} />
+<link rel="alternate" hreflang="fi" href={canonicalUrl} />
+<link rel="alternate" hreflang="x-default" href={canonicalUrl} />
+
+<meta property="og:type" content={pageType === "Article" ? "article" : "website"} />
+<meta property="og:locale" content="fi_FI" />
+<meta property="og:site_name" content="MGA Kasinot" />
+<meta property="og:title" content={title} />
+{description && <meta property="og:description" content={description} />}
+<meta property="og:url" content={canonicalUrl} />
+<meta property="og:image" content={ogImageUrl} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+{description && <meta name="twitter:description" content={description} />}
+<meta name="twitter:image" content={ogImageUrl} />
+
+<script type="application/ld+json" set:html={jsonLd}></script>
+</head>
+<body>
+<header class="site-header"><div class="shell header-inner"><a class="brand" href="/">MGA Kasinot</a><nav aria-label="Päävalikko"><a href="/nettikasinot/">NETTIKASINOT</a><a href="/uudet-nettikasinot/">UUDET NETTIKASINOT</a><a href="/ilmaiskierrokset/">ILMAISKIERROKSET</a><a href="/kasinobonukset/">KASINOBONUKSET</a></nav></div></header>
+<main class="shell"><slot /></main>
+<footer><div class="shell">© {new Date().getFullYear()} MGA Kasinot</div></footer>
+</body></html>
