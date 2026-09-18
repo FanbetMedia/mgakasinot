@@ -118,10 +118,10 @@ jobs:
             grep -q "application/ld+json" index.html
             grep -q "property=\"og:title\"" index.html
             grep -q "DirectoryIndex index.html" .htaccess
-            grep -Fq "private, no-cache, no-store, max-age=0, must-revalidate" .htaccess
-            grep -Fq "X-Accel-Expires \"0\"" .htaccess
+            grep -Fq "public, max-age=0, must-revalidate" .htaccess
             grep -Fq "max-age=31536000, immutable" .htaccess
             grep -Fq "max-age=2592000" .htaccess
+            grep -Fq "no-cache, no-store, max-age=0, must-revalidate" .htaccess
             grep -Fq "User-agent: *" robots.txt
             grep -Fq "Allow: /" robots.txt
             grep -Fq "Sitemap: https://mgakasinot.com/sitemap-index.xml" robots.txt
