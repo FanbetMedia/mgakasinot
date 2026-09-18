@@ -5,3 +5,5 @@ Astro migration is developed in the `astro-migration` branch and deployed only a
 CI trigger: Astro migration validation.
 
 Deployment trigger: Astro production.
+
+Visual redesign CI trigger.
