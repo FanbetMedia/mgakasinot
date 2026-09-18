@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
+import StructuredContent from "../components/StructuredContent.astro";
 import { pages } from "../data/site";
 import { buildInternalLinks } from "../lib/internalLinks";
 import { optimizeContentImages } from "../lib/contentImages";
@@ -14,8 +15,8 @@ export function getStaticPaths(){
 const { page } = Astro.props;
 const marker = '<div data-brand-table></div>';
 const linkedHtml = optimizeContentImages(buildInternalLinks(page.html, `/${page.slug}/`));
-const [before, after=''] = linkedHtml.split(marker);
 const hasTable = linkedHtml.includes(marker);
+const [beforeTable, afterTable=''] = hasTable ? linkedHtml.split(marker) : ['', linkedHtml];
 const isArticle = page.type === "post";
 ---
 <BaseLayout
@@ -34,9 +35,13 @@ const isArticle = page.type === "post";
 
   <section class="section shell">
     <article class="content">
-      <Fragment set:html={before} />
+      {hasTable && beforeTable && <div class="content-intro"><Fragment set:html={beforeTable} /></div>}
       {hasTable && <BrandTable />}
-      <Fragment set:html={after} />
+      <StructuredContent html={afterTable} slug={page.slug} type={page.type} />
     </article>
   </section>
 </BaseLayout>
+
+<style>
+.content-intro{margin-bottom:34px}
+</style>
