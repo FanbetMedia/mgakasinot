@@ -1,3 +1,11 @@
 import { defineConfig } from "astro/config";
 import sitemap from "@astrojs/sitemap";
-export default defineConfig({ site: "https://mgakasinot.com", trailingSlash: "always", integrations:[sitemap()] });
+
+export default defineConfig({
+  site: "https://mgakasinot.com",
+  trailingSlash: "always",
+  build: {
+    inlineStylesheets: "always",
+  },
+  integrations: [sitemap()],
+});
