@@ -55,6 +55,11 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Sync MGA domain registry
+        run: |
+          set -euo pipefail
+          npm run sync:mga
+          node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync("public/mga-sites.json","utf8")); if(!Array.isArray(d.entries)||d.entries.length<300) process.exit(1); for(const x of ["casimba.com","bet365.com"]) if(!d.entries.some(e=>e.domain===x)) process.exit(1); console.log(`Validated ${d.entries.length} MGA domains`);'
       - run: npm run build
       - run: npm run check:links
 
@@ -81,8 +86,11 @@ jobs:
           setsid ssh-add ~/.ssh/siteground_key </dev/null
 
           test -f dist/index.html
+          test -f dist/mga-sites.json
           grep -Fq "$PUBLIC_BUILD_SHA" dist/index.html
           grep -Fq 'SYVENTÄVÄ MGA-OPAS' dist/index.html
+          grep -Fq 'casimba.com' dist/mga-sites.json
+          grep -Fq 'bet365.com' dist/mga-sites.json
 
           if [ -d dist/_astro ]; then
             rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
@@ -102,6 +110,9 @@ jobs:
             test -s index.html
             test -s robots.txt
             test -s sitemap-index.xml
+            test -s mga-sites.json
+            grep -Fq "casimba.com" mga-sites.json
+            grep -Fq "bet365.com" mga-sites.json
             grep -Fq "SYVENTÄVÄ MGA-OPAS" index.html
             grep -Fq "Koko MGA-opas selkeämpänä kokonaisuutena" index.html
             grep -q "application/ld+json" index.html
