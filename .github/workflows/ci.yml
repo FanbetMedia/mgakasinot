@@ -16,13 +16,13 @@ jobs:
         run: |
           test -s dist/robots.txt
           test -s dist/sitemap-index.xml
-          grep -q '^User-agent: \* dist/robots.txt
-          grep -q '^Allow: / dist/robots.txt
-          grep -q 'Sitemap: https://mgakasinot.com/sitemap-index.xml' dist/robots.txt
-          grep -q 'https://mgakasinot.com/' dist/sitemap-index.xml
-          if grep -Ril --include='*.html' 'noindex' dist; then
+          grep -Fq "User-agent: *" dist/robots.txt
+          grep -Fq "Allow: /" dist/robots.txt
+          grep -Fq "Sitemap: https://mgakasinot.com/sitemap-index.xml" dist/robots.txt
+          grep -Fq "https://mgakasinot.com/" dist/sitemap-index.xml
+          if grep -Ril --include="*.html" "noindex" dist; then
             echo "Found noindex in generated HTML"
             exit 1
           fi
-          grep -q '<meta name="robots" content="index,follow' dist/index.html
-          grep -q '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
+          grep -Fq '<meta name="robots" content="index,follow' dist/index.html
+          grep -Fq '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
