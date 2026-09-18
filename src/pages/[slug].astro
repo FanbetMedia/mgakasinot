@@ -8,6 +8,6 @@ const marker='<div data-brand-table></div>';
 const [before, after=''] = page.html.split(marker);
 const hasTable = page.html.includes(marker);
 ---
-<BaseLayout title={page.seoTitle} description={page.description} canonical={`/${page.slug}/`}>
+<BaseLayout title={page.seoTitle} description={page.description} canonical={`/${page.slug}/`} pageType={page.type === "post" ? "Article" : "WebPage"}>
 <article class="content"><h1>{page.title}</h1><Fragment set:html={before} />{hasTable && <BrandTable />}<Fragment set:html={after} /></article>
 </BaseLayout>
