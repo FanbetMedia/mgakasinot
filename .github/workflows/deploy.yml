@@ -138,8 +138,6 @@ jobs:
             if curl -fsS \
               --connect-timeout 10 \
               --max-time 30 \
-              -H 'Cache-Control: no-cache' \
-              -H 'Pragma: no-cache' \
               -D "$headers" \
               "$url" \
               -o "$body"; then
@@ -164,7 +162,7 @@ jobs:
           done
 
           if [ "$success" -ne 1 ]; then
-            echo "Production smoke test failed: canonical https://mgakasinot.com/ is still serving stale HTML."
+            echo "Production smoke test failed: canonical https://mgakasinot.com/ is still serving stale HTML to a normal request."
             echo "Do not treat this deploy as live until the SiteGround Dynamic Cache/CDN cache has been purged once."
             exit 1
           fi
