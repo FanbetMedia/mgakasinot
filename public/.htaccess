@@ -11,6 +11,14 @@ DirectoryIndex index.html
     Header always set Expires "0"
   </FilesMatch>
 
+  # The MGA registry snapshot is regenerated on deploy and must not go stale.
+  <Files "mga-sites.json">
+    Header always set Cache-Control "private, no-cache, no-store, max-age=0, must-revalidate"
+    Header always set X-Accel-Expires "0"
+    Header always set Pragma "no-cache"
+    Header always set Expires "0"
+  </Files>
+
   # Content images can remain cached for 30 days.
   <FilesMatch "\.(avif|webp|png|jpe?g|gif|svg|ico)$">
     Header always set Cache-Control "public, max-age=2592000"
