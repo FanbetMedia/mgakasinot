@@ -310,9 +310,34 @@ button,input,textarea,select{font:inherit}
   .hero-copy{padding:28px;border-radius:22px}
   .hero h1,.page-hero h1{font-size:clamp(36px,11vw,52px)}
   .hero-stats{grid-template-columns:1fr}
-  .hero-visual{min-height:330px;border-radius:22px}
-  .hero-card--main{left:20px;right:20px;padding:22px}
+  .hero-visual{
+    min-height:auto;
+    border-radius:22px;
+    padding:112px 20px 24px;
+    overflow:hidden
+  }
+  .hero-card--main{
+    position:relative;
+    left:auto;
+    right:auto;
+    top:auto;
+    transform:none;
+    padding:22px;
+    min-height:0
+  }
   .hero-card--main strong{font-size:26px}
+  .hero-card--mini{
+    top:20px;
+    right:20px;
+    width:72px;
+    height:72px
+  }
+  .hero-card--mini-2{
+    left:20px;
+    right:auto;
+    top:20px;
+    bottom:auto
+  }
   .feature-grid,.article-card-grid,.article-card-grid--archive{grid-template-columns:1fr}
   .feature-card{min-height:auto}
   .section{padding:28px 0 44px}
