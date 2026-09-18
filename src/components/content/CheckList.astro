@@ -1,0 +1,13 @@
+---
+interface Props { items: string[]; title?: string; intro?: string }
+const { items, title = "Tarkista nämä", intro } = Astro.props;
+---
+<section class="checklist">
+  <div class="checklist__intro"><span>TARKISTUSLISTA</span><h3>{title}</h3>{intro && <p>{intro}</p>}</div>
+  <ul>{items.map((item)=><li><span aria-hidden="true">✓</span><p>{item}</p></li>)}</ul>
+</section>
+<style>
+.checklist{margin:40px 0 48px;display:grid;grid-template-columns:minmax(220px,.7fr) minmax(0,1.3fr);gap:46px;padding:30px 0;border-top:1px solid rgba(255,255,255,.13);border-bottom:1px solid rgba(255,255,255,.13)}
+.checklist__intro>span{color:#ffab5d;font-size:11px;font-weight:900;letter-spacing:.13em}.checklist__intro h3{margin:7px 0 8px;color:#fff;font-size:27px;letter-spacing:-.025em}.checklist__intro p{margin:0;color:#91a3b6;font-size:14px}.checklist ul{list-style:none;padding:0;margin:0}.checklist li{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:11px 0;border-top:1px solid rgba(255,255,255,.08)}.checklist li:first-child{border-top:0}.checklist li>span{color:#7ce3a1;font-weight:950}.checklist li p{margin:0;color:#c7d1db}
+@media(max-width:720px){.checklist{grid-template-columns:1fr;gap:20px}}
+</style>
