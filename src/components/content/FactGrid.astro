@@ -1,0 +1,15 @@
+---
+type Fact = { value?: string; label: string; text?: string };
+interface Props { facts: Fact[]; title?: string }
+const { facts, title } = Astro.props;
+---
+<section class="factgrid">
+  {title && <h3>{title}</h3>}
+  <div class="factgrid__grid">
+    {facts.map((fact, i)=><div class="factgrid__item"><span>{fact.value || String(i+1).padStart(2,"0")}</span><strong>{fact.label}</strong>{fact.text && <p>{fact.text}</p>}</div>)}
+  </div>
+</section>
+<style>
+.factgrid{margin:38px 0 48px}.factgrid>h3{font-size:25px;margin:0 0 16px;color:#fff}.factgrid__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid rgba(255,255,255,.14);border-left:1px solid rgba(255,255,255,.08)}.factgrid__item{min-height:142px;padding:22px;border-right:1px solid rgba(255,255,255,.08);border-bottom:1px solid rgba(255,255,255,.08)}.factgrid__item>span{display:block;color:#ff9f47;font-size:12px;font-weight:950;letter-spacing:.1em;margin-bottom:14px}.factgrid__item strong{display:block;color:#fff;font-size:18px}.factgrid__item p{margin:6px 0 0;color:#91a3b6;font-size:14px;line-height:1.55}
+@media(max-width:620px){.factgrid__grid{grid-template-columns:1fr}}
+</style>
