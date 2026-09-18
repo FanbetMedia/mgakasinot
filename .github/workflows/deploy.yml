@@ -21,7 +21,7 @@ jobs:
         run: |
           test -s dist/robots.txt
           test -s dist/sitemap-index.xml
-          grep -q '^User-agent: \*
+          grep -Fq "User-agent: *" dist/robots.txt
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
@@ -66,8 +66,8 @@ jobs:
             grep -q "application/ld+json" index.html
             grep -q "property=\"og:title\"" index.html
             grep -q "DirectoryIndex index.html" .htaccess
-            grep -q "^User-agent: \*$" robots.txt
-            grep -q "^Allow: /$" robots.txt
+            grep -Fq "User-agent: *" robots.txt
+            grep -Fq "Allow: /" robots.txt
             grep -q "Sitemap: https://mgakasinot.com/sitemap-index.xml" robots.txt
             grep -q "https://mgakasinot.com/" sitemap-index.xml
             if grep -Ril --include="*.html" "noindex" .; then
@@ -78,7 +78,7 @@ jobs:
             grep -q "<link rel=\"canonical\" href=\"https://mgakasinot.com/\"" index.html
           '
  dist/robots.txt
-          grep -q '^Allow: /
+          grep -Fq "Allow: /" dist/robots.txt
     if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
