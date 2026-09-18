@@ -110,20 +110,37 @@
   const renderRecord = (result, domain, record, suggested = false) => {
     const badgeClass = record.status === "mga" ? "result-status result-status--ok" : "result-status result-status--warn";
     const suggestionLead = suggested
-      ? `<p class="checker-suggestion-lead">Tarkoititko <strong>${escapeHtml(domain)}</strong>?</p>`
+      ? `<p class="checker-suggestion-lead">Tarkoititko <strong>${escapeHtml(domain)}</strong>? Näytetään tämän domainin tiedot.</p>`
       : "";
-    const brandText = record.brand && suggested ? `${escapeHtml(record.brand)}: ` : "";
+    const summary = record.brand === "Bet365"
+      ? `<p class="result-summary">Bet365.com löytyy MGA:n rekisteristä Hillside-yhtiöiden alla. Alla näkyvät tarkistusdataan tallennetut nykyiset MGA-lisenssitiedot.</p>`
+      : "";
 
     result.innerHTML = `
       ${suggestionLead}
       <span class="${badgeClass}">${escapeHtml(record.label)}</span>
       <strong class="result-domain">${escapeHtml(domain)}</strong>
+      ${summary}
       <dl>
         <div><dt>Operaattori</dt><dd>${escapeHtml(record.operator)}</dd></div>
         <div><dt>Lisenssitieto</dt><dd>${escapeHtml(record.licence)}</dd></div>
       </dl>
-      <a class="result-source" href="${escapeHtml(record.verification)}" target="_blank" rel="noopener noreferrer">Avaa lähde ↗</a>
-      <p class="result-note">${brandText}Tee vielä lopullinen tarkistus viranomaisen omasta rekisteristä, sillä lisenssistatus voi muuttua.</p>`;
+      <a class="result-source" href="${escapeHtml(record.verification)}" target="_blank" rel="noopener noreferrer">Avaa MGA-lähde ↗</a>
+      <p class="result-note">Tee vielä lopullinen tarkistus viranomaisen omasta rekisteristä, sillä lisenssistatus ja operaattoritiedot voivat muuttua.</p>`;
+  };
+
+  const injectStyles = () => {
+    if (document.getElementById("license-checker-enhancement-styles")) return;
+    const style = document.createElement("style");
+    style.id = "license-checker-enhancement-styles";
+    style.textContent = `
+      .result-status--suggestion{color:#ffbf7a}
+      .checker-suggestion-lead{color:#dbe5ef!important;font-size:15px!important;margin-top:12px!important}
+      .checker-suggestion{appearance:none;border:0;background:transparent;color:#ffad63;font:inherit;font-weight:900;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+      .checker-suggestion:hover{color:#fff}
+      .result-summary{color:#c9d4df!important}
+    `;
+    document.head.appendChild(style);
   };
 
   const init = () => {
@@ -136,6 +153,7 @@
     const input = form.querySelector("input");
     if (!(input instanceof HTMLInputElement)) return;
 
+    injectStyles();
     let currentDomain = "";
 
     form.addEventListener("submit", (event) => {
@@ -144,11 +162,11 @@
 
       currentDomain = normaliseDomain(input.value);
       if (!currentDomain) return;
+      input.value = currentDomain;
 
       const record = checkerRecords.find((item) => item.domains.includes(currentDomain));
       if (record) {
         renderRecord(result, currentDomain, record);
-        input.value = currentDomain;
         actions.hidden = false;
         return;
       }
@@ -156,7 +174,6 @@
       const suggestion = findSuggestion(currentDomain);
       if (suggestion) {
         const typedDomain = currentDomain;
-        currentDomain = suggestion.domain;
         result.innerHTML = `
           <span class="result-status result-status--suggestion">Mahdollinen kirjoitusvirhe</span>
           <strong class="result-domain">${escapeHtml(typedDomain)}</strong>
@@ -180,9 +197,18 @@
       actions.hidden = false;
     }, true);
 
-    copyButton?.addEventListener("click", (event) => {
-      if (!currentDomain) return;
+    copyButton?.addEventListener("click", async (event) => {
+      event.preventDefault();
       event.stopImmediatePropagation();
+      if (!currentDomain || !(copyButton instanceof HTMLButtonElement)) return;
+      try {
+        await navigator.clipboard.writeText(currentDomain);
+        copyButton.textContent = "Kopioitu";
+        setTimeout(() => { copyButton.textContent = "Kopioi domain"; }, 1400);
+      } catch {
+        copyButton.textContent = currentDomain;
+        setTimeout(() => { copyButton.textContent = "Kopioi domain"; }, 1800);
+      }
     }, true);
   };
 
