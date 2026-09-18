@@ -179,7 +179,7 @@ button,input,textarea,select{font:inherit}
   min-height:78px;padding:10px 12px;border-radius:14px;background:#fff;
   display:flex;align-items:center;justify-content:center
 }
-.casino-logo img{width:125px;max-height:58px;object-fit:contain}
+.casino-logo img{width:125px;height:58px;object-fit:contain}
 .casino-main h3{font-size:19px;margin:0;color:#fff}
 .casino-title-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .featured-badge{

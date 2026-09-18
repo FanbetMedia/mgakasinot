@@ -8,7 +8,7 @@ import { brands } from "../data/site";
 
     <div class="casino-logo">
       {brand.logo
-        ? <img src={brand.logo.replace("https://mgakasinot.com","")} alt={brand.name} loading={i < 2 ? "eager" : "lazy"} />
+        ? <img src={brand.logo.replace("https://mgakasinot.com","")} alt={brand.name} width="125" height="58" loading="lazy" decoding="async" />
         : <strong>{brand.name}</strong>}
     </div>
 
