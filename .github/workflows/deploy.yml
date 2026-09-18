@@ -22,7 +22,7 @@ jobs:
           test -s dist/robots.txt
           test -s dist/sitemap-index.xml
           grep -Fq "User-agent: *" dist/robots.txt
-    if: github.event_name != 'pull_request'
+    if: github.event_name != 'pull_request' || github.head_ref == 'production-indexability-check'
     needs: build
     runs-on: ubuntu-latest
     steps:
