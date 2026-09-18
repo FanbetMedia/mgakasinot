@@ -1,0 +1,37 @@
+---
+type TabItem = { label: string; title: string; content: string; bullets?: string[] };
+interface Props { items: TabItem[]; label?: string; id?: string }
+const { items, label = "Valitse näkymä", id = `tabs-${Math.random().toString(36).slice(2,8)}` } = Astro.props;
+---
+<section class="ctabs" data-content-tabs>
+  <div class="ctabs__topline"><span>{label}</span></div>
+  <div class="ctabs__nav" role="tablist" aria-label={label}>
+    {items.map((item, i) => <button type="button" role="tab" aria-selected={i===0 ? "true" : "false"} aria-controls={`${id}-${i}`} class:list={["ctabs__tab", i===0 && "is-active"]} data-tab-index={i}>{item.label}</button>)}
+  </div>
+  <div class="ctabs__body">
+    {items.map((item, i) => <div id={`${id}-${i}`} role="tabpanel" class:list={["ctabs__panel", i===0 && "is-active"]} hidden={i!==0} data-tab-panel={i}>
+      <h3>{item.title}</h3>
+      <p>{item.content}</p>
+      {item.bullets?.length ? <ul>{item.bullets.map((bullet)=><li>{bullet}</li>)}</ul> : null}
+    </div>)}
+  </div>
+</section>
+<script>
+  document.querySelectorAll('[data-content-tabs]').forEach((root) => {
+    const tabs = [...root.querySelectorAll('[data-tab-index]')];
+    const panels = [...root.querySelectorAll('[data-tab-panel]')];
+    tabs.forEach((tab) => tab.addEventListener('click', () => {
+      const index = tab.getAttribute('data-tab-index');
+      tabs.forEach((btn) => { const active = btn === tab; btn.classList.toggle('is-active', active); btn.setAttribute('aria-selected', active ? 'true' : 'false'); });
+      panels.forEach((panel) => { const active = panel.getAttribute('data-tab-panel') === index; panel.classList.toggle('is-active', active); panel.toggleAttribute('hidden', !active); });
+    }));
+  });
+</script>
+<style>
+.ctabs{margin:38px 0 46px;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}
+.ctabs__topline{padding:13px 0 0;color:#7f94a8;font-size:11px;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.ctabs__nav{display:flex;gap:26px;overflow:auto;border-bottom:1px solid rgba(255,255,255,.09);margin-top:9px}
+.ctabs__tab{appearance:none;border:0;background:none;color:#91a3b6;padding:13px 0 12px;white-space:nowrap;font-weight:850;cursor:pointer;border-bottom:2px solid transparent}
+.ctabs__tab.is-active{color:#fff;border-bottom-color:#ff8a1f}
+.ctabs__body{padding:25px 0 29px;max-width:780px}.ctabs__panel h3{margin:0 0 9px;font-size:24px;color:#fff;letter-spacing:-.025em}.ctabs__panel p{margin:0;color:#c5d0dc}.ctabs__panel ul{margin:15px 0 0;padding-left:20px;color:#aebdcb}.ctabs__panel li+li{margin-top:6px}
+</style>
