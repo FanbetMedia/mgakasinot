@@ -3,6 +3,7 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
 import { pages } from "../data/site";
 import { buildInternalLinks } from "../lib/internalLinks";
+import { optimizeContentImages } from "../lib/contentImages";
 
 export function getStaticPaths(){
   return pages
@@ -12,7 +13,7 @@ export function getStaticPaths(){
 
 const { page } = Astro.props;
 const marker = '<div data-brand-table></div>';
-const linkedHtml = buildInternalLinks(page.html, `/${page.slug}/`);
+const linkedHtml = optimizeContentImages(buildInternalLinks(page.html, `/${page.slug}/`));
 const [before, after=''] = linkedHtml.split(marker);
 const hasTable = linkedHtml.includes(marker);
 const isArticle = page.type === "post";
