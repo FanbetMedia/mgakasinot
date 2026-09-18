@@ -17,6 +17,122 @@ jobs:
         with: { node-version: 22 }
       - run: npm install
       - run: npm run build
+      - name: Validate indexability
+        run: |
+          test -s dist/robots.txt
+          test -s dist/sitemap-index.xml
+          grep -Fq "User-agent: *" dist/robots.txt
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build
+      - name: Deploy dist to SiteGround
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SG_SSH_PASSPHRASE }}
+          SSH_HOST: ${{ secrets.SG_SSH_HOST }}
+          SSH_USER: ${{ secrets.SG_SSH_USER }}
+          SSH_PORT: ${{ secrets.SG_SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/siteground_key
+          chmod 600 ~/.ssh/siteground_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          cat > ~/.ssh/askpass.sh <<'EOF'
+          #!/bin/sh
+          echo "$SSH_PASSPHRASE"
+          EOF
+          chmod 700 ~/.ssh/askpass.sh
+          export SSH_ASKPASS=~/.ssh/askpass.sh SSH_ASKPASS_REQUIRE=force DISPLAY=:0 SSH_PASSPHRASE
+          setsid ssh-add ~/.ssh/siteground_key </dev/null
+          test -f dist/index.html
+          if [ -d dist/_astro ]; then
+            rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
+          fi
+          rsync -az --delete --exclude='.well-known/' --exclude='php_errorlog' --exclude='_astro/' --exclude='wp-content/uploads/' -e "ssh -p $SSH_PORT" dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
+
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
+            set -e
+            cd /home/customer/www/mgakasinot.com/public_html
+            test -s index.html
+            test -s robots.txt
+            test -s sitemap-index.xml
+            grep -q "application/ld+json" index.html
+            grep -q "property=\"og:title\"" index.html
+            grep -q "DirectoryIndex index.html" .htaccess
+            grep -Fq "User-agent: *" robots.txt
+            grep -Fq "Allow: /" robots.txt
+            grep -q "Sitemap: https://mgakasinot.com/sitemap-index.xml" robots.txt
+            grep -q "https://mgakasinot.com/" sitemap-index.xml
+            if grep -Ril --include="*.html" "noindex" .; then
+              echo "Found noindex on deployed HTML"
+              exit 1
+            fi
+            grep -q "<meta name=\"robots\" content=\"index,follow" index.html
+            grep -q "<link rel=\"canonical\" href=\"https://mgakasinot.com/\"" index.html
+          '
+ dist/robots.txt
+          grep -Fq "Allow: /" dist/robots.txt
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: npm install
+      - run: npm run build
+      - name: Deploy dist to SiteGround
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SG_SSH_PRIVATE_KEY }}
+          SSH_PASSPHRASE: ${{ secrets.SG_SSH_PASSPHRASE }}
+          SSH_HOST: ${{ secrets.SG_SSH_HOST }}
+          SSH_USER: ${{ secrets.SG_SSH_USER }}
+          SSH_PORT: ${{ secrets.SG_SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh
+          printf '%s\n' "$SSH_PRIVATE_KEY" > ~/.ssh/siteground_key
+          chmod 600 ~/.ssh/siteground_key
+          ssh-keyscan -p "$SSH_PORT" -H "$SSH_HOST" >> ~/.ssh/known_hosts
+          eval "$(ssh-agent -s)"
+          cat > ~/.ssh/askpass.sh <<'EOF'
+          #!/bin/sh
+          echo "$SSH_PASSPHRASE"
+          EOF
+          chmod 700 ~/.ssh/askpass.sh
+          export SSH_ASKPASS=~/.ssh/askpass.sh SSH_ASKPASS_REQUIRE=force DISPLAY=:0 SSH_PASSPHRASE
+          setsid ssh-add ~/.ssh/siteground_key </dev/null
+          test -f dist/index.html
+          if [ -d dist/_astro ]; then
+            rsync -az -e "ssh -p $SSH_PORT" dist/_astro/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/_astro/"
+          fi
+          rsync -az --delete --exclude='.well-known/' --exclude='php_errorlog' --exclude='_astro/' --exclude='wp-content/uploads/' -e "ssh -p $SSH_PORT" dist/ "$SSH_USER@$SSH_HOST:/home/customer/www/mgakasinot.com/public_html/"
+
+          ssh -p "$SSH_PORT" "$SSH_USER@$SSH_HOST" '
+            set -e
+            cd /home/customer/www/mgakasinot.com/public_html
+            test -s index.html
+            test -s robots.txt
+            test -s sitemap-index.xml
+            grep -q "application/ld+json" index.html
+            grep -q "property=\"og:title\"" index.html
+            grep -q "DirectoryIndex index.html" .htaccess
+          '
+ dist/robots.txt
+          grep -q 'Sitemap: https://mgakasinot.com/sitemap-index.xml' dist/robots.txt
+          grep -q 'https://mgakasinot.com/' dist/sitemap-index.xml
+          if grep -Ril --include='*.html' 'noindex' dist; then
+            echo "Found noindex in generated HTML"
+            exit 1
+          fi
+          grep -q '<meta name="robots" content="index,follow' dist/index.html
+          grep -q '<link rel="canonical" href="https://mgakasinot.com/"' dist/index.html
   deploy:
     if: github.event_name != 'pull_request'
     needs: build
