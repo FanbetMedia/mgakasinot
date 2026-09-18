@@ -1,0 +1,15 @@
+---
+type Side = { title: string; lead?: string; items: string[] };
+interface Props { left: Side; right: Side; label?: string }
+const { left, right, label = "Vertailu" } = Astro.props;
+---
+<section class="comparison">
+  <div class="comparison__label">{label}</div>
+  <div class="comparison__grid">
+    {[left,right].map((side)=><div class="comparison__side"><h3>{side.title}</h3>{side.lead && <p class="comparison__lead">{side.lead}</p>}<ul>{side.items.map((item)=><li>{item}</li>)}</ul></div>)}
+  </div>
+</section>
+<style>
+.comparison{margin:42px 0 50px;border-top:1px solid rgba(255,255,255,.14);border-bottom:1px solid rgba(255,255,255,.14)}.comparison__label{padding:12px 0;color:#ffab5d;font-size:11px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.comparison__grid{display:grid;grid-template-columns:1fr 1fr}.comparison__side{padding:24px 28px 28px 0}.comparison__side+ .comparison__side{padding-left:28px;border-left:1px solid rgba(255,255,255,.1)}.comparison h3{margin:0 0 8px;color:#fff;font-size:24px}.comparison__lead{margin:0 0 15px;color:#91a3b6}.comparison ul{list-style:none;margin:0;padding:0}.comparison li{padding:9px 0;border-top:1px solid rgba(255,255,255,.07);color:#c5d0dc}.comparison li:before{content:"—";color:#ff9f47;margin-right:9px}
+@media(max-width:700px){.comparison__grid{grid-template-columns:1fr}.comparison__side+ .comparison__side{padding-left:0;border-left:0;border-top:1px solid rgba(255,255,255,.1)}}
+</style>
