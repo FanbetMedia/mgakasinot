@@ -2,10 +2,12 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import BrandTable from "../components/BrandTable.astro";
 import { pages, brands } from "../data/site";
+import { buildInternalLinks } from "../lib/internalLinks";
 
 const page = pages.find((p)=>p.slug === "mga-kasinot")!;
 const marker = '<div data-brand-table></div>';
-const [before, after=''] = page.html.split(marker);
+const linkedHtml = buildInternalLinks(page.html, "/");
+const [before, after=''] = linkedHtml.split(marker);
 const articles = pages.filter((p)=>p.type === "post").slice(0,3);
 ---
 <BaseLayout title={page.seoTitle} description={page.description} canonical="/">
