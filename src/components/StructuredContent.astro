@@ -1,0 +1,102 @@
+---
+import ContentTabs from "./content/ContentTabs.astro";
+import StepGuide from "./content/StepGuide.astro";
+import CheckList from "./content/CheckList.astro";
+import FactGrid from "./content/FactGrid.astro";
+import Comparison from "./content/Comparison.astro";
+import Timeline from "./content/Timeline.astro";
+import ExpertNote from "./content/ExpertNote.astro";
+import CasinoMiniList from "./content/CasinoMiniList.astro";
+import ToolCard from "./content/ToolCard.astro";
+
+interface Props { html: string; slug: string; type?: string }
+const { html, slug, type = "page" } = Astro.props;
+const strip = (value:string) => value.replace(/<[^>]*>/g," ").replace(/&nbsp;/g," ").replace(/\s+/g," ").trim();
+const matches = [...html.matchAll(/<h2\b[^>]*>[\s\S]*?<\/h2>/gi)];
+const prelude = matches.length ? html.slice(0, matches[0].index) : html;
+const used = new Set<string>();
+const sections = matches.map((match, index) => {
+  const start = match.index || 0;
+  const bodyStart = start + match[0].length;
+  const end = index + 1 < matches.length ? (matches[index+1].index || html.length) : html.length;
+  const heading = strip(match[0]);
+  const key = heading.toLowerCase();
+  let enhancement = "";
+  const choose = (name:string, test:boolean) => { if (!enhancement && test && !used.has(name)) { enhancement = name; used.add(name); } };
+  choose("tabs", /bonus|ilmaiskier|pikakasin|pay n play|maksutap/.test(key));
+  choose("step", /näin|miten|valitus|rekisteröitym|aloita|tunnista/.test(key));
+  choose("check", /turvall|luotett|lisens|vastuull|ehto/.test(key));
+  choose("facts", /mikä on|tarkoittaa|ilmaiskier|verovap|vuonna 2026/.test(key));
+  choose("comparison", /pikakasin|pay n play|verovap|maksutap|perinteinen/.test(key));
+  choose("timeline", /uudet|valitus|prosessi|historia/.test(key));
+  choose("expert", /valita|paras|arvostel|kokem|kannatta/.test(key));
+  if (!enhancement && type !== "post" && index >= 2 && !used.has("mini")) { enhancement = "mini"; used.add("mini"); }
+  if (!enhancement && /lisens|tarkist/.test(key) && !used.has("tool")) { enhancement = "tool"; used.add("tool"); }
+  return { headingHtml: match[0], bodyHtml: html.slice(bodyStart,end), heading, key, enhancement, index };
+});
+
+const bonusTabs = [
+  {label:"Talletusbonus",title:"Talletukseen sidottu bonus",content:"Bonus määräytyy talletuksen mukaan. Tarkista aina bonusprosentti, maksimisummaa koskevat rajat ja kierrätysvaatimus."},
+  {label:"Ilmaiskierrokset",title:"Kierroksia valittuihin peleihin",content:"Kierrosten määrä ei yksin kerro tarjouksen arvoa. Kierroskohtainen panos ja mahdollinen kierrätys ovat yhtä tärkeitä."},
+  {label:"Kierrätysvapaa",title:"Voitot ilman perinteistä kierrätystä",content:"Ehdot vaihtelevat kasinoittain, joten tarkista etenkin mahdollinen maksimivoitto ja pelirajoitukset."}
+];
+const casinoTabs = [
+  {label:"Pikakasino",title:"Pelaaminen pankkitunnuksilla",content:"Tunnistautuminen ja maksaminen voidaan yhdistää samaan prosessiin ilman pitkää rekisteröintilomaketta."},
+  {label:"Perinteinen kasino",title:"Tavallinen käyttäjätili",content:"Rekisteröinti tehdään erikseen ja maksutapoja sekä tilinhallinnan vaihtoehtoja voi olla enemmän."}
+];
+---
+<div class="structured-content">
+  {prelude && <div class="structured-content__prelude"><Fragment set:html={prelude} /></div>}
+  {sections.map((section, index) => (
+    <section class:list={["structured-section", index % 2 ? "structured-section--alt" : ""]} data-section-index={index+1}>
+      <div class="structured-section__number" aria-hidden="true">{String(index+1).padStart(2,"0")}</div>
+      <div class="structured-section__original">
+        <Fragment set:html={section.headingHtml} />
+        <Fragment set:html={section.bodyHtml} />
+      </div>
+
+      {section.enhancement === "tabs" && <ContentTabs label="Vertaa vaihtoehtoja" items={/pikakasin|pay n play|maksutap/.test(section.key) ? casinoTabs : bonusTabs} />}
+      {section.enhancement === "step" && <StepGuide title={/valitus/.test(section.key) ? "Etene tässä järjestyksessä" : "Käytännön eteneminen"} steps={/valitus/.test(section.key) ? [
+        {title:"Ota yhteys kasinoon",text:"Kuvaa ongelma mahdollisimman tarkasti ja pyydä kirjallinen vastaus."},
+        {title:"Tee virallinen reklamaatio",text:"Säilytä viestit, tapahtumatunnukset, ehdot ja kuvakaappaukset."},
+        {title:"Tarkista riidanratkaisukanava",text:"Kasino kertoo ehdoissaan käytettävän ADR- tai muun virallisen käsittelyreitin."},
+        {title:"Vie asia tarvittaessa viranomaiselle",text:"Tarkista lisenssin myöntäjän ohjeet ennen yhteydenottoa."}
+      ] : [
+        {title:"Tarkista perustiedot",text:"Katso operaattori, lisenssi, ehdot ja kasinon käyttämä domain."},
+        {title:"Vertaa olennaiset erot",text:"Kiinnitä huomiota maksuihin, bonusehtoihin ja kotiutuskäytäntöihin."},
+        {title:"Aloita pienesti",text:"Testaa käytettävyys ja rahaliikenne ennen suurempaa saldoa."}
+      ]} />}
+      {section.enhancement === "check" && <CheckList title="Tarkista ennen kuin teet päätöksen" items={[
+        "Operaattorin nimi ja kasinon käyttämä domain täsmäävät lisenssitietoihin.",
+        "Lisenssin status tarkistetaan viranomaisen omasta rekisteristä.",
+        "Bonus- ja kotiutusehdot ovat luettavissa ennen talletusta.",
+        "Vastuullisen pelaamisen rajat ja sulkutyökalut löytyvät helposti."
+      ]} />}
+      {section.enhancement === "facts" && <FactGrid title="Oleelliset asiat yhdellä silmäyksellä" facts={/ilmaiskier/.test(section.key) ? [
+        {label:"Kierrosten määrä",text:"Katso kuinka monta kierrosta tarjous oikeasti sisältää."},
+        {label:"Kierroskohtainen arvo",text:"Panos vaikuttaa suoraan kierrosten todelliseen rahalliseen arvoon."},
+        {label:"Kierrätys",text:"Tarkista koskeeko voittosaldoa kierrätysvaatimus."},
+        {label:"Voimassaolo",text:"Lyhyt käyttöaika voi tehdä muuten hyvästä tarjouksesta vaikean hyödyntää."}
+      ] : [
+        {label:"Lisenssi",text:"Tarkista toimivaltainen viranomainen ja nykyinen status."},
+        {label:"Operaattori",text:"Sama yhtiö voi operoida useita eri kasinobrändejä."},
+        {label:"Maksut",text:"Talletus- ja kotiutusmenetelmät vaikuttavat käytännön kokemukseen."},
+        {label:"Ehdot",text:"Bonusten ja kotiutusten rajat ratkaisevat enemmän kuin mainoslauseet."}
+      ]} />}
+      {section.enhancement === "comparison" && <Comparison label="Rinnakkain" left={/verovap/.test(section.key) ? {title:"EU / ETA",lead:"Verotuksessa olennaista on toimeenpanopaikka ja luvan lainmukaisuus.",items:["Tarkista operaattori","Tarkista lisenssi","Varmista nykyinen verokohtelu"]} : {title:"Pikakasino",lead:"Nopea tunnistautuminen pankin kautta.",items:["Vähemmän lomakkeita","Pankkitunnistautuminen","Usein suoraviivainen maksupolku"]}} right={/verovap/.test(section.key) ? {title:"EU / ETA:n ulkopuoli",lead:"Verokohtelu voi olla erilainen kuin ETA-alueella.",items:["Älä päättele verotusta brändin nimestä","Tarkista missä peli toimeenpannaan","Tarvittaessa varmista Verohallinnolta"]} : {title:"Perinteinen kasino",lead:"Erillinen käyttäjätili ja rekisteröinti.",items:["Oma profiili","Useita maksutapoja","Tilinhallinta erikseen"]}} />}
+      {section.enhancement === "timeline" && <Timeline title={/valitus/.test(section.key) ? "Ongelman käsittely vaiheittain" : "Näin uusi kasino kannattaa käydä läpi"} entries={/valitus/.test(section.key) ? [
+        {marker:"01",title:"Dokumentoi",text:"Tallenna tapahtumat, viestit ja ehdot."},{marker:"02",title:"Reklamoi",text:"Pyydä kasinolta kirjallinen ratkaisu."},{marker:"03",title:"Eskaloi",text:"Siirry tarvittaessa viralliseen riidanratkaisuun."}
+      ] : [
+        {marker:"01",title:"Lanseeraus",text:"Tarkista, onko kyse oikeasti uudesta brändistä vai vanhan kasinon uudesta ilmeestä."},{marker:"02",title:"Lisenssi",text:"Varmista operaattori, domain ja lisenssin status."},{marker:"03",title:"Testaus",text:"Arvioi maksut, ehdot, pelivalikoima ja käytettävyys."},{marker:"04",title:"Päivitys",text:"Pidä tiedot ajan tasalla myös lanseerauksen jälkeen."}
+      ]} />}
+      {section.enhancement === "expert" && <ExpertNote title="Pelkkä yksittäinen etu ei ratkaise kokonaisuutta" text="Kasinoa tai tarjousta kannattaa arvioida aina kokonaisuutena. Lisenssi, ehdot, rahaliikenne ja käytettävyys voivat olla tärkeämpiä kuin yksittäinen suuri bonus tai näyttävä kampanja." />}
+      {section.enhancement === "mini" && <CasinoMiniList heading="Hyvin arvioituja vaihtoehtoja nykyisestä vertailusta" limit={5} minRating={4.7} />}
+      {section.enhancement === "tool" && <ToolCard label="LICENSE CHECKER" title="Tarkista kasinon lisenssitiedot" description="Etusivun License Checker auttaa tarkistamaan domainin ja ohjaa lopulliseen viranomaisvarmennukseen." href="/#license-checker" cta="Avaa License Checker →" />}
+    </section>
+  ))}
+</div>
+
+<style>
+.structured-content__prelude{margin-bottom:38px}.structured-section{position:relative;padding:46px 0 18px;border-top:1px solid rgba(255,255,255,.10)}.structured-section:first-of-type{border-top:0}.structured-section__number{position:absolute;left:-62px;top:53px;color:#3f566a;font-size:11px;font-weight:950;letter-spacing:.12em}.structured-section--alt:before{content:"";position:absolute;inset:18px -36px 0;z-index:-1;background:linear-gradient(90deg,rgba(20,53,83,.16),transparent 72%);border-radius:2px}.structured-section__original>:first-child{margin-top:0}
+@media(max-width:1080px){.structured-section__number{position:static;margin-bottom:8px;color:#61788d}.structured-section--alt:before{inset:18px -14px 0}}
+</style>
