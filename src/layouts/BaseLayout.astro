@@ -1,5 +1,6 @@
 ---
 import "../styles/global.css";
+import { pages } from "../data/site";
 
 const {
   title,
@@ -13,6 +14,11 @@ const siteUrl = Astro.site ?? new URL("https://mgakasinot.com");
 const canonicalUrl = new URL(canonical, siteUrl).toString();
 const ogImageUrl = new URL(ogImage, siteUrl).toString();
 const schemaType = pageType === "Article" ? "Article" : "WebPage";
+
+const mainSlugs = ["mga-kasinot","nettikasinot","uudet-nettikasinot","ilmaiskierrokset","kasinobonukset"];
+const mainPages = pages.filter((p) => mainSlugs.includes(p.slug));
+const infoPages = pages.filter((p) => p.type === "page" && !mainSlugs.includes(p.slug)).slice(0, 8);
+const articlePages = pages.filter((p) => p.type === "post").slice(0, 7);
 
 const schema = {
   "@context": "https://schema.org",
@@ -46,6 +52,7 @@ const schema = {
     },
   ],
 };
+
 const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
 ---
 <!doctype html>
@@ -76,7 +83,115 @@ const jsonLd = JSON.stringify(schema).replace(/</g, "\\u003c");
 <script type="application/ld+json" set:html={jsonLd}></script>
 </head>
 <body>
-<header class="site-header"><div class="shell header-inner"><a class="brand" href="/">MGA Kasinot</a><nav aria-label="Päävalikko"><a href="/nettikasinot/">NETTIKASINOT</a><a href="/uudet-nettikasinot/">UUDET NETTIKASINOT</a><a href="/ilmaiskierrokset/">ILMAISKIERROKSET</a><a href="/kasinobonukset/">KASINOBONUKSET</a></nav></div></header>
-<main class="shell"><slot /></main>
-<footer><div class="shell">© {new Date().getFullYear()} MGA Kasinot</div></footer>
-</body></html>
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="MGA Kasinot etusivu">
+      <span class="brand-mark">MGA</span>
+      <span class="brand-name">Kasinot</span>
+    </a>
+
+    <button class="menu-toggle" type="button" aria-label="Avaa valikko" aria-expanded="false" aria-controls="main-menu" data-menu-toggle>
+      <span></span><span></span><span></span>
+    </button>
+
+    <nav id="main-menu" class="main-nav" aria-label="Päävalikko" data-menu>
+      <a href="/nettikasinot/">Nettikasinot</a>
+      <a href="/uudet-nettikasinot/">Uudet nettikasinot</a>
+      <a href="/ilmaiskierrokset/">Ilmaiskierrokset</a>
+      <a href="/kasinobonukset/">Kasinobonukset</a>
+      <a href="/artikkelit/">Artikkelit</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <slot />
+</main>
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <section class="footer-about" aria-labelledby="footer-about-title">
+      <a class="brand footer-brand" href="/">
+        <span class="brand-mark">MGA</span>
+        <span class="brand-name">Kasinot</span>
+      </a>
+      <h2 id="footer-about-title" class="sr-only">Tietoa sivustosta</h2>
+      <p>MGA Kasinot kokoaa kasinovertailuja, bonustietoja ja rahapelaamiseen liittyviä oppaita suomalaisille lukijoille.</p>
+      <div class="responsible-row" aria-label="Vastuullinen pelaaminen ja viranomaislinkit">
+        <a href="https://www.peluuri.fi/" target="_blank" rel="nofollow noopener noreferrer">Peluuri</a>
+        <a href="https://www.gamcare.org.uk/" target="_blank" rel="nofollow noopener noreferrer">GamCare</a>
+        <a href="https://www.emta.ee/en" target="_blank" rel="nofollow noopener noreferrer">EMTA</a>
+        <a href="https://www.mga.org.mt/" target="_blank" rel="nofollow noopener noreferrer">MGA</a>
+        <span class="age-badge" aria-label="Vain 18 vuotta täyttäneille">18+</span>
+      </div>
+    </section>
+
+    <nav class="footer-column" aria-label="Pääsivut">
+      <h3>Pääsivut</h3>
+      <ul>
+        {mainPages.map((page) => (
+          <li><a href={page.slug === "mga-kasinot" ? "/" : `/${page.slug}/`}>{page.title}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="footer-column" aria-label="Infosivut">
+      <h3>Infosivut</h3>
+      <ul>
+        {infoPages.map((page) => (
+          <li><a href={`/${page.slug}/`}>{page.title}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="footer-column" aria-label="Artikkelit">
+      <h3>Artikkelit</h3>
+      <ul>
+        <li><a href="/artikkelit/">Kaikki artikkelit</a></li>
+        {articlePages.map((page) => (
+          <li><a href={`/${page.slug}/`}>{page.title}</a></li>
+        ))}
+      </ul>
+    </nav>
+  </div>
+
+  <div class="shell footer-notice">
+    <p>Rahapelaaminen on tarkoitettu vain 18 vuotta täyttäneille. Pelaa maltilla ja hae tarvittaessa apua Peluurista.</p>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="shell footer-bottom-inner">
+      <span>© {new Date().getFullYear()} MGA Kasinot</span>
+      <span>18+ · Pelaa vastuullisesti</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  const toggle = document.querySelector("[data-menu-toggle]");
+  const menu = document.querySelector("[data-menu]");
+
+  if (toggle instanceof HTMLButtonElement && menu instanceof HTMLElement) {
+    const closeMenu = () => {
+      menu.classList.remove("is-open");
+      toggle.classList.remove("is-open");
+      toggle.setAttribute("aria-expanded", "false");
+      document.body.classList.remove("menu-open");
+    };
+
+    toggle.addEventListener("click", () => {
+      const open = !menu.classList.contains("is-open");
+      menu.classList.toggle("is-open", open);
+      toggle.classList.toggle("is-open", open);
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+      document.body.classList.toggle("menu-open", open);
+    });
+
+    menu.querySelectorAll("a").forEach((link) => link.addEventListener("click", closeMenu));
+    window.addEventListener("resize", () => {
+      if (window.innerWidth > 920) closeMenu();
+    });
+  }
+</script>
+</body>
+</html>

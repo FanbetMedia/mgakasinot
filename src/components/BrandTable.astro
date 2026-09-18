@@ -2,11 +2,35 @@
 import { brands } from "../data/site";
 ---
 <section class="brand-list" aria-label="MGA kasinot">
-{brands.map((brand, i) => <article class="casino-card">
-  <div class="rank">{i+1}</div>
-  <div class="casino-logo">{brand.logo ? <img src={brand.logo.replace('https://mgakasinot.com','')} alt={brand.name} loading={i<2?'eager':'lazy'} /> : <strong>{brand.name}</strong>}</div>
-  <div class="casino-main"><span class="bonus-label">Talletusbonus</span><strong class="bonus">{brand.description}</strong></div>
-  <div class="casino-score"><strong>{brand.name}</strong><span>{brand.rating}/10</span></div>
-  <div class="casino-cta">{brand.affiliate ? <a href={brand.affiliate} rel="nofollow sponsored" target="_blank">SIIRRY KASINOLLE</a> : <span class="disabled">EI LINKKIÄ</span>}</div>
-</article>)}
+{brands.map((brand, i) => (
+  <article class:list={["casino-card", i === 0 && "casino-card--featured"]}>
+    <div class="casino-rank" aria-label={`Sija ${i+1}`}>{i+1}</div>
+
+    <div class="casino-logo">
+      {brand.logo
+        ? <img src={brand.logo.replace("https://mgakasinot.com","")} alt={brand.name} loading={i < 2 ? "eager" : "lazy"} />
+        : <strong>{brand.name}</strong>}
+    </div>
+
+    <div class="casino-main">
+      <div class="casino-title-row">
+        <h3>{brand.name}</h3>
+        {i === 0 && <span class="featured-badge">Listan kärki</span>}
+      </div>
+      <span class="bonus-label">{brand.bonusType === "deposit" ? "Talletusbonus" : "Bonus"}</span>
+      <strong class="bonus">{brand.description}</strong>
+    </div>
+
+    <div class="casino-score" aria-label={`Arvosana ${brand.rating} viidestä`}>
+      <span class="score-number">{brand.rating}</span>
+      <span class="score-max">/ 5</span>
+    </div>
+
+    <div class="casino-cta">
+      {brand.affiliate
+        ? <a class="btn btn-primary" href={brand.affiliate} rel="nofollow sponsored noopener noreferrer" target="_blank">Siirry kasinolle</a>
+        : <span class="btn btn-disabled">Ei linkkiä</span>}
+    </div>
+  </article>
+))}
 </section>

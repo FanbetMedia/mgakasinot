@@ -1,0 +1,32 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { pages } from "../data/site";
+
+const articles = pages.filter((p)=>p.type === "post");
+---
+<BaseLayout
+  title="Artikkelit | MGA Kasinot"
+  description="MGA Kasinot -sivuston artikkelit rahapelaamisesta, lisensseistä, maksuista ja kasinoalasta."
+  canonical="/artikkelit/"
+>
+  <section class="page-hero page-hero--compact">
+    <div class="shell">
+      <span class="eyebrow">ARTIKKELIT</span>
+      <h1>Oppaat ja ajankohtaiset artikkelit</h1>
+      <p>Lue sivuston artikkelit lisensseistä, maksuista ja rahapelialan ilmiöistä.</p>
+    </div>
+  </section>
+
+  <section class="section shell">
+    <div class="article-card-grid article-card-grid--archive">
+      {articles.map((article) => (
+        <a class="article-card" href={`/${article.slug}/`}>
+          <span class="article-kicker">Artikkeli</span>
+          <h2>{article.title}</h2>
+          <p>{article.description || "Lue artikkeli ja tutustu aiheeseen tarkemmin."}</p>
+          <span class="text-link">Lue lisää →</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
