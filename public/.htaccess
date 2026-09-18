@@ -1,21 +1,22 @@
 DirectoryIndex index.html
 
 <IfModule mod_headers.c>
-  # HTML must always be revalidated so a GitHub deploy becomes visible immediately.
+  # HTML changes must be visible immediately after each GitHub deploy.
+  # SiteGround documents Cache-Control: private for disabling server-side cache
+  # on non-WordPress sites. X-Accel-Expires: 0 also prevents CDN edge caching.
   <FilesMatch "\.html$">
-    Header always set Cache-Control "no-cache, max-age=0, must-revalidate"
+    Header always set Cache-Control "private, no-cache, no-store, max-age=0, must-revalidate"
+    Header always set X-Accel-Expires "0"
     Header always set Pragma "no-cache"
     Header always set Expires "0"
   </FilesMatch>
 
-  # Content images can stay cached for 30 days. They are much heavier than HTML
-  # and normally keep stable filenames.
+  # Content images can remain cached for 30 days.
   <FilesMatch "\.(avif|webp|png|jpe?g|gif|svg|ico)$">
     Header always set Cache-Control "public, max-age=2592000"
   </FilesMatch>
 
-  # Astro generates fingerprinted assets under /_astro/. Their filenames change
-  # when the file content changes, so a one-year immutable cache is safe.
+  # Astro fingerprints compiled assets, so immutable one-year caching is safe.
   SetEnvIf Request_URI "^/_astro/" ASTRO_IMMUTABLE=1
   Header always set Cache-Control "public, max-age=31536000, immutable" env=ASTRO_IMMUTABLE
 </IfModule>
