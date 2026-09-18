@@ -26,12 +26,29 @@ walk(root);
 
 const problems = [];
 
+const blockedAnchorsByRoute = {
+  "/": new Set(["mga kasinot", "mga-kasinot", "kasinot"]),
+  "/nettikasinot/": new Set(["nettikasinot", "netti kasinot", "kasinot", "parhaat kasinot"]),
+  "/uudet-nettikasinot/": new Set(["uudet nettikasinot", "uudet kasinot", "nettikasinot", "kasinot"]),
+  "/kasinobonukset/": new Set(["kasinobonukset", "kasinobonus", "bonukset"]),
+  "/ilmaiskierrokset/": new Set(["ilmaiskierrokset", "ilmaiskierroksia"]),
+};
+
+function routeFromFile(file) {
+  const rel = path.relative(root, file).replaceAll(path.sep, "/");
+  if (rel === "index.html") return "/";
+  return `/${rel.replace(/\/index\.html$/, "")}/`;
+}
+
+
 for (const file of files) {
   const html = fs.readFileSync(file, "utf8");
   const article = html.match(/<article\b[^>]*class="[^"]*\bcontent\b[^"]*"[^>]*>([\s\S]*?)<\/article>/i);
   if (!article) continue;
 
   const body = article[1];
+  const route = routeFromFile(file);
+  const blockedAnchors = blockedAnchorsByRoute[route] ?? new Set();
   const targetSet = new Set();
   const anchorMap = new Map();
 
@@ -40,6 +57,10 @@ for (const file of files) {
     if (!target) continue;
 
     const anchor = anchorText(match[2]);
+
+    if (blockedAnchors.has(anchor)) {
+      problems.push(`${file}: focus-keyword fragment "${anchor}" must not be an internal anchor on ${route}`);
+    }
 
     if (targetSet.has(target)) {
       problems.push(`${file}: duplicate editorial target ${target}`);
